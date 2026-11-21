@@ -35,7 +35,7 @@ select{width:100%;margin-top:6px;padding:11px;border-radius:12px;border:1px soli
 .viva-item{padding:12px 0;border-bottom:1px solid var(--bd)}
 .viva-item:last-child{border-bottom:0}
 .viva-item summary{font-weight:700;cursor:pointer;line-height:1.65;list-style-position:inside}
-.viva-answer{margin:10px 0 0 0;padding:11px 12px;border-radius:10px;background:rgba(91,75,213,.08);line-height:1.75}
+.viva-fu{margin:8px 0 0 6px;padding-left:10px;border-left:3px solid #5b4bd5}.viva-fut{font-size:12px;opacity:.75;margin-bottom:4px}.viva-fu details{margin:6px 0}.viva-fu summary{font-size:14px;cursor:pointer}.viva-answer{margin:10px 0 0 0;padding:11px 12px;border-radius:10px;background:rgba(91,75,213,.08);line-height:1.75}
 .viva-note{font-size:14px;line-height:1.7;color:var(--mu)}
 </style>
 </head>
@@ -65,9 +65,11 @@ renderViva();
 function renderViva(){
 const q=$("vivaSearch")?.value.trim().toLowerCase()||"";
 const c=$("vivaCat")?.value??"";
-const filtered=VIVA.filter(x=>(c===""||VIVA_CATS.indexOf(x.cat)===+c)&&(!q||(x.q+" "+x.a+" "+x.cat).toLowerCase().includes(q)));
+const txt=x=>x.q+" "+x.a+" "+(x.f||[]).map(txt).join(" ");
+const filtered=VIVA.filter(x=>(c===""||VIVA_CATS.indexOf(x.cat)===+c)&&(!q||(txt(x)+" "+x.cat).toLowerCase().includes(q)));
 $("vivaCount").textContent=`${bn(filtered.length)}টি প্রশ্ন পাওয়া গেছে`;
-$("vivaList").innerHTML=filtered.map(x=>`<div class="viva-item"><details><summary>${bn(x.n)}. ${x.q}</summary><div class="viva-answer">${x.a}</div></details></div>`).join("")||`<p class="viva-note">কোনো প্রশ্ন পাওয়া যায়নি। অন্য শব্দ দিয়ে খুঁজুন।</p>`;
+const fu=(l,d)=>l&&l.length?`<div class="viva-fu"><div class="viva-fut">🔗 এরপর যা জিজ্ঞেস করতে পারে</div>${l.map(y=>`<details class="fu${d}"><summary>↳ ${y.q}</summary><div class="viva-answer">${y.a}</div>${fu(y.f,d+1)}</details>`).join("")}</div>`:"";
+$("vivaList").innerHTML=filtered.map(x=>`<div class="viva-item"><details><summary>${bn(x.n)}. ${x.q}</summary><div class="viva-answer">${x.a}</div>${fu(x.f,1)}</details></div>`).join("")||`<p class="viva-note">কোনো প্রশ্ন পাওয়া যায়নি। অন্য শব্দ দিয়ে খুঁজুন।</p>`;
 }
 function home(){clearInterval(S.t);A.innerHTML=`<div class="hero"><h2 style="margin:0 0 4px">পরীক্ষা নির্ধারণ</h2><small>আপনার পছন্দ মতো অধ্যায়, সময় ও নম্বর ঠিক করুন</small></div>
 <div class="grid"><div class="card"><label class="f">⏰ সময়<select id="tm">${[10,20,30,60,120].map(m=>`<option value="${m}" ${m==30?"selected":""}>${bn(m)} মিনিট</option>`).join("")}</select></label></div>
