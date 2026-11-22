@@ -4,12 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>BAKIR's Mechaverse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <style>
 :root{--bg:#f4f5fa;--card:#fff;--tx:#1b1f3a;--mu:#6b7090;--pr:#5b4bd5;--ok:#1a9d55;--no:#d33a3a;--bd:#dfe2ee;--hd:#0a5f80;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#10121c;--card:#1a1d2c;--tx:#eceefa;--mu:#9aa0c0;--bd:#2c3048;--hd:#0b4a66}}
 :root[data-theme=dark]{--bg:#10121c;--card:#1a1d2c;--tx:#eceefa;--mu:#9aa0c0;--bd:#2c3048;--hd:#0b4a66}
 *{box-sizing:border-box}html,body{margin:0}
-body{background:var(--bg);color:var(--tx);font-family:"Hind Siliguri","Noto Sans Bengali",system-ui,sans-serif;font-size:16px}
+body{background:var(--bg);color:var(--tx);font-family:"Hind Siliguri",Roboto,Arial,"Noto Sans Bengali","Noto Sans",system-ui,sans-serif;font-size:16px}
 header{background:var(--hd);color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:20px}
 header button{background:none;border:0;color:#fff;font-size:20px}
 main{max-width:640px;margin:0 auto;padding:14px}
@@ -35,7 +40,8 @@ select{width:100%;margin-top:6px;padding:11px;border-radius:12px;border:1px soli
 .viva-item{padding:12px 0;border-bottom:1px solid var(--bd)}
 .viva-item:last-child{border-bottom:0}
 .viva-item summary{font-weight:700;cursor:pointer;line-height:1.65;list-style-position:inside}
-.viva-fu{margin:8px 0 0 6px;padding-left:10px;border-left:3px solid #5b4bd5}.viva-fut{font-size:12px;opacity:.75;margin-bottom:4px}.viva-fu details{margin:6px 0}.viva-fu summary{font-size:14px;cursor:pointer}.viva-answer{white-space:pre-line;margin:10px 0 0 0;padding:11px 12px;border-radius:10px;background:rgba(91,75,213,.08);line-height:1.75}
+.viva-fu{margin:8px 0 0 6px;padding-left:10px;border-left:3px solid #5b4bd5}.viva-fut{font-size:12px;opacity:.75;margin-bottom:4px}.viva-fu details{margin:6px 0}.viva-fu summary{font-size:14px;cursor:pointer}.viva-answer{white-space:pre-line;margin:10px 0 0 0;padding:11px 12px;border-radius:10px;background:rgba(91,75,213,.08);line-height:1.75;overflow-x:auto;overflow-wrap:anywhere}
+.viva-answer .katex{font-size:1.06em}.viva-answer .katex-display{margin:.55em 0;padding:2px 0;overflow-x:auto;overflow-y:hidden}
 .viva-note{font-size:14px;line-height:1.7;color:var(--mu)}
 main{padding-bottom:96px}
 #nb{display:none;position:fixed;left:0;right:0;bottom:0;gap:10px;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:1px solid var(--bd);z-index:9}
@@ -65,7 +71,11 @@ function chapList(){return CH.map((c,i)=>{const n=Q.filter(q=>q[0]==i).length;re
 function picked(){return[...document.querySelectorAll(".ck:checked")].map(e=>+e.value)}
 function all(){const c=[...document.querySelectorAll(".ck")],on=c.some(e=>!e.checked);c.forEach(e=>e.checked=on)}
 const shuf=a=>a.slice().sort(()=>Math.random()-.5);
-const vfu=(l,d)=>l&&l.length?`<div class="viva-fu"><div class="viva-fut">🔗 ${L("এরপর যা জিজ্ঞেস করতে পারে","Possible next questions")}</div>${l.map(y=>`<details class="fu${d}"><summary>↳ ${y.q}</summary><div class="viva-answer">${y.a}</div>${vfu(y.f,d+1)}</details>`).join("")}</div>`:"";
+function mx(s){s=s==null?"":String(s);if(s.indexOf("$")<0)return s;
+const rd=(t,d)=>{try{if(window.katex)return katex.renderToString(t,{throwOnError:false,strict:false,displayMode:d})}catch(e){}return esc(t)};
+const ps=s.split("\n").map(l=>{const m=l.match(/^\s*\$([^$]+)\$\s*$/);return m&&m[1].length>12?{d:1,h:rd(m[1],true)}:{d:0,h:l.replace(/\$([^$]+)\$/g,(_,t)=>rd(t,false))}});
+let o="";ps.forEach((p,i)=>{if(i&&!p.d&&!ps[i-1].d)o+="\n";o+=p.h});return o}
+const vfu=(l,d)=>l&&l.length?`<div class="viva-fu"><div class="viva-fut">🔗 ${L("এরপর যা জিজ্ঞেস করতে পারে","Possible next questions")}</div>${l.map(y=>`<details class="fu${d}"><summary>↳ ${mx(y.q)}</summary><div class="viva-answer">${mx(y.a)}</div>${vfu(y.f,d+1)}</details>`).join("")}</div>`:"";
 let BK=null;
 function show(html,back,keep){A.innerHTML=html;BK=back||null;$("nb").style.display=back?"flex":"none";if(!keep)window.scrollTo(0,0)}
 function goBack(){if(S.running&&!confirm(L("পরীক্ষা ছেড়ে বের হবেন? উত্তর হারিয়ে যাবে।","Leave the exam? Your answers will be lost.")))return;if(S.running){clearInterval(S.t);S.running=false;S.i=0}if(BK)BK();else menu()}
@@ -94,7 +104,7 @@ const c=$("vivaCat")?.value??"";
 const txt=x=>x.q+" "+x.a+" "+(x.f||[]).map(txt).join(" ");
 const filtered=VIVA.filter(x=>(c===""||VIVA_CATS.indexOf(x.cat)===+c)&&(!q||(txt(x)+" "+x.cat).toLowerCase().includes(q)));
 $("vivaCount").textContent=bn(filtered.length)+L("টি প্রশ্ন পাওয়া গেছে"," questions found");
-$("vivaList").innerHTML=filtered.map(x=>`<div class="viva-item"><details><summary>${bn(x.n)}. ${x.q}</summary><div class="viva-answer">${x.a}</div>${vfu(x.f,1)}</details></div>`).join("")||`<p class="viva-note">${L("কোনো প্রশ্ন পাওয়া যায়নি। অন্য শব্দ দিয়ে খুঁজুন।","No questions found. Try other words.")}</p>`;
+$("vivaList").innerHTML=filtered.map(x=>`<div class="viva-item"><details><summary>${bn(x.n)}. ${mx(x.q)}</summary><div class="viva-answer">${mx(x.a)}</div>${vfu(x.f,1)}</details></div>`).join("")||`<p class="viva-note">${L("কোনো প্রশ্ন পাওয়া যায়নি। অন্য শব্দ দিয়ে খুঁজুন।","No questions found. Try other words.")}</p>`;
 }
 function examSetup(){CUR=examSetup;clearInterval(S.t);S.running=false;show(`<div class="hero"><h2 style="margin:0 0 4px">📝 ${L("পরীক্ষা","Exam")}</h2><small>${L("আপনার পছন্দ মতো অধ্যায়, সময় ও নম্বর ঠিক করুন","Choose chapters, time and marks as you like")}</small></div>
 <div class="grid"><div class="card"><label class="f">⏰ ${L("সময়","Time")}<select id="tm">${[10,20,30,60,120].map(m=>`<option value="${m}" ${m==30?"selected":""}>${bn(m)} ${L("মিনিট","min")}</option>`).join("")}</select></label></div>
@@ -115,7 +125,7 @@ const OL=()=>LANG==="en"?"ABCD":"কখগঘ";
 function exam(){CUR=exam;const T=S.q.length+S.vv.length,hd=`<div class="card"><div class="top"><span>${L("প্রশ্ন","Question")} ${bn(S.i+1)}/${bn(T)}</span><span class="tm">⏱ <span id="tmr"></span></span></div></div>`;
 let body;
 if(S.i<S.q.length){const x=S.q[S.i];body=`<div class="card"><b>${x[1]}</b>${x[2].map((o,k)=>`<button class="opt ${S.a[S.i]==k?"sel":""}" onclick="ans(${k})">${OL()[k]}. ${o}</button>`).join("")}</div>`}
-else{const j=S.i-S.q.length,x=S.vv[j];body=`<div class="card"><span class="viva-note">🎤 ${L("ভাইভা প্রশ্ন (মৌখিক) — মনে মনে উত্তর দিন","Viva question (oral) — answer in your mind")}</span><p><b>${x.q}</b></p>${S.sh[j]?`<div class="viva-answer">${x.a}</div>${vfu(x.f,1)}<div class="nav"><button class="btn ${S.va[j]==1?"":"g"}" onclick="rate(1)">✅ ${L("পেরেছি","I knew it")}</button><button class="btn ${S.va[j]==0?"":"g"}" onclick="rate(0)">❌ ${L("পারিনি","I didn't")}</button></div>`:`<button class="btn" onclick="reveal()">${L("উত্তর দেখুন","Show answer")}</button>`}</div>`}
+else{const j=S.i-S.q.length,x=S.vv[j];body=`<div class="card"><span class="viva-note">🎤 ${L("ভাইভা প্রশ্ন (মৌখিক) — মনে মনে উত্তর দিন","Viva question (oral) — answer in your mind")}</span><p><b>${mx(x.q)}</b></p>${S.sh[j]?`<div class="viva-answer">${mx(x.a)}</div>${vfu(x.f,1)}<div class="nav"><button class="btn ${S.va[j]==1?"":"g"}" onclick="rate(1)">✅ ${L("পেরেছি","I knew it")}</button><button class="btn ${S.va[j]==0?"":"g"}" onclick="rate(0)">❌ ${L("পারিনি","I didn't")}</button></div>`:`<button class="btn" onclick="reveal()">${L("উত্তর দেখুন","Show answer")}</button>`}</div>`}
 show(hd+body+`<div class="nav"><button class="btn g" onclick="go(-1)" ${S.i?"":"disabled"}>${L("← আগের","← Previous")}</button><button class="btn g" onclick="go(1)" ${S.i<T-1?"":"disabled"}>${L("পরের →","Next →")}</button></div><button class="btn" onclick="if(confirm('${L("পরীক্ষা জমা দিবেন?","Submit the exam?")}'))finish()">${L("জমা দিন","Submit")}</button>`,examSetup,true);tick()}
 function ans(k){S.a[S.i]=S.a[S.i]==k?-1:k;exam()}
 function reveal(){S.sh[S.i-S.q.length]=true;exam()}
@@ -126,7 +136,7 @@ const sc=Math.round((c*S.mk-w*S.ng)*100)/100,vy=S.va.filter(v=>v==1).length,vn=S
 show((S.q.length?`<div class="card"><div class="big">${bn(sc)}</div><div class="st"><div>✅ ${L("সঠিক","Correct")}<br><b>${bn(c)}</b></div><div>❌ ${L("ভুল","Wrong")}<br><b>${bn(w)}</b></div><div>⏭ ${L("বাদ","Skipped")}<br><b>${bn(S.q.length-c-w)}</b></div></div></div>`:"")
 +(S.vv.length?`<div class="card"><b>🎤 ${L("ভাইভা স্ব-মূল্যায়ন","Viva self-assessment")}</b><div class="st"><div>✅ ${L("পেরেছি","Knew it")}<br><b>${bn(vy)}</b></div><div>❌ ${L("পারিনি","Didn't")}<br><b>${bn(vn)}</b></div><div>⏭ ${L("দেখিনি","Not rated")}<br><b>${bn(S.vv.length-vy-vn)}</b></div></div></div>`:"")
 +S.q.map((x,i)=>book(x,i,S.a[i])).join("")
-+(S.vv.length?`<h3>${L("ভাইভা প্রশ্নের উত্তর","Viva answers")}</h3>`+S.vv.map((x,j)=>`<div class="viva-item card"><details><summary>${bn(j+1)}. ${x.q} ${S.va[j]==1?"✅":S.va[j]==0?"❌":""}</summary><div class="viva-answer">${x.a}</div>${vfu(x.f,1)}</details></div>`).join(""):"")
++(S.vv.length?`<h3>${L("ভাইভা প্রশ্নের উত্তর","Viva answers")}</h3>`+S.vv.map((x,j)=>`<div class="viva-item card"><details><summary>${bn(j+1)}. ${mx(x.q)} ${S.va[j]==1?"✅":S.va[j]==0?"❌":""}</summary><div class="viva-answer">${mx(x.a)}</div>${vfu(x.f,1)}</details></div>`).join(""):"")
 +`<button class="btn" onclick="examSetup()">${L("নতুন পরীক্ষা","New exam")}</button>`,menu)}
 function book(x,i,u){return`<div class="card"><b>${bn(i+1)}. ${x[1]}</b>${x[2].map((o,k)=>`<div class="opt ${k==x[3]?"ok":k==u?"no":""}">${OL()[k]}. ${o}${k==x[3]?" ✓":k==u?" ✗":""}</div>`).join("")}${x[4]?`<div class="exp">💡 ${x[4]}</div>`:""}</div>`}
 const API="https://script.google.com/macros/s/AKfycbyccCrYpZvexzHcwLzHgNui7FyLHjMIFINXx3vaBm-IgpiJdyz95a1Qw1hrksdJif5R/exec";
