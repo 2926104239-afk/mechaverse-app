@@ -37,11 +37,20 @@ select{width:100%;margin-top:6px;padding:11px;border-radius:12px;border:1px soli
 .viva-item summary{font-weight:700;cursor:pointer;line-height:1.65;list-style-position:inside}
 .viva-fu{margin:8px 0 0 6px;padding-left:10px;border-left:3px solid #5b4bd5}.viva-fut{font-size:12px;opacity:.75;margin-bottom:4px}.viva-fu details{margin:6px 0}.viva-fu summary{font-size:14px;cursor:pointer}.viva-answer{white-space:pre-line;margin:10px 0 0 0;padding:11px 12px;border-radius:10px;background:rgba(91,75,213,.08);line-height:1.75}
 .viva-note{font-size:14px;line-height:1.7;color:var(--mu)}
+main{padding-bottom:96px}
+#nb{display:none;position:fixed;left:0;right:0;bottom:0;gap:10px;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:1px solid var(--bd);z-index:9}
+#nb button{flex:1;padding:12px;border-radius:12px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font:inherit;font-weight:700}
+.mn{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:18px 16px;margin-bottom:12px;border-radius:16px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font:inherit}
+.mn:disabled{opacity:.5}.mn b{display:block;font-size:18px}.mn small{color:var(--mu);font-size:13px}
+.mn .mi{font-size:28px;min-width:40px;text-align:center}.mn.ch{padding:13px 14px}.mn.ch .mi{font-size:18px;font-weight:800;color:var(--pr);background:rgba(91,75,213,.12);border-radius:10px;padding:6px 0}.mn.ch b{font-size:16px}
+.splash{text-align:center;padding:90px 10px}.sp1{font-size:20px;color:var(--mu)}.sp2{font-size:34px;font-weight:800;color:var(--pr);margin:8px 0 14px;animation:fi 1s ease}.splash small{color:var(--mu)}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
 <header><span>BAKIR's Mechaverse</span><div><button id="lo" onclick="logout()" aria-label="বের হন" style="display:none">⎋</button><button onclick="dk()" aria-label="থিম">◐</button></div></header>
 <main id="app"></main>
+<div id="nb"><button onclick="goBack()">← পিছনে</button><button onclick="goHome()">🏠 হোম</button></div>
 <script>
 const bn=n=>String(n).replace(/\d/g,d=>"০১২৩৪৫৬৭৮৯"[d]).replace("-","−");
 let CH=[],Q=[],VIVA=[],VIVA_CATS=[];
@@ -52,14 +61,28 @@ function chapList(){return CH.map((c,i)=>{const n=Q.filter(q=>q[0]==i).length;re
 function picked(){return[...document.querySelectorAll(".ck:checked")].map(e=>+e.value)}
 function all(){const c=[...document.querySelectorAll(".ck")],on=c.some(e=>!e.checked);c.forEach(e=>e.checked=on)}
 
+const shuf=a=>a.slice().sort(()=>Math.random()-.5);
+const vfu=(l,d)=>l&&l.length?`<div class="viva-fu"><div class="viva-fut">🔗 এরপর যা জিজ্ঞেস করতে পারে</div>${l.map(y=>`<details class="fu${d}"><summary>↳ ${y.q}</summary><div class="viva-answer">${y.a}</div>${vfu(y.f,d+1)}</details>`).join("")}</div>`:"";
+let BK=null;
+function show(html,back,keep){A.innerHTML=html;BK=back||null;$("nb").style.display=back?"flex":"none";if(!keep)window.scrollTo(0,0)}
+function goBack(){if(S.running&&!confirm("পরীক্ষা ছেড়ে বের হবেন? উত্তর হারিয়ে যাবে।"))return;if(S.running){clearInterval(S.t);S.running=false;S.i=0}if(BK)BK();else menu()}
+function goHome(){if(S.running&&!confirm("পরীক্ষা ছেড়ে বের হবেন? উত্তর হারিয়ে যাবে।"))return;clearInterval(S.t);S.running=false;menu()}
+function splash(){clearInterval(S.t);show(`<div class="splash"><div class="sp1">Welcome to</div><div class="sp2">BAKIR's Mechaverse</div><small>Mechanical Engineering | Power Engineering</small></div>`,null);setTimeout(()=>{if(document.querySelector(".splash"))menu()},1800)}
+function menu(){clearInterval(S.t);S.running=false;
+show(`<div class="hero"><h2 style="margin:0 0 4px">BAKIR's Mechaverse</h2><small>কী করতে চান?</small></div>
+<button class="mn" onclick="study()"><span class="mi">📖</span><span><b>পড়াশোনা</b><small>অধ্যায় ভিত্তিক MCQ, উত্তর ও ব্যাখ্যাসহ</small></span></button>
+<button class="mn" onclick="vivaHome()"><span class="mi">🎤</span><span><b>ভাইভা প্রস্তুতি</b><small>ভাইভার প্রশ্ন, উত্তর ও পরের সম্ভাব্য প্রশ্ন</small></span></button>
+<button class="mn" onclick="examSetup()"><span class="mi">📝</span><span><b>পরীক্ষা</b><small>সময় ও নম্বর ঠিক করে মডেল টেস্ট দিন</small></span></button>`,null)}
+function study(){show(`<div class="hero"><h2 style="margin:0">📖 পড়াশোনা</h2><small>একটি অধ্যায়ে চাপ দিন, উত্তর ও ব্যাখ্যাসহ পড়ুন</small></div>
+${CH.map((c,i)=>{const n=Q.filter(q=>q[0]==i).length;return `<button class="mn ch" ${n?`onclick="readCh(${i})"`:"disabled"}><span class="mi">${bn(i+1)}</span><span><b>${c}</b><small>${n?bn(n)+"টি প্রশ্ন":"শীঘ্রই আসছে"}</small></span></button>`}).join("")}`,menu)}
+function readCh(c){show(`<h3 style="margin:6px 0 10px">${CH[c]}</h3>`+Q.filter(x=>x[0]==c).map((x,i)=>book(x,i,-1)).join(""),study)}
 function vivaHome(){
 clearInterval(S.t);
-A.innerHTML=`<div class="hero"><h2 style="margin:0 0 4px">ভাইভা প্রস্তুতি</h2><small>কোম্পানির ভাইভার ২০০টি প্রশ্নোত্তর</small></div>
+show(`<div class="hero"><h2 style="margin:0 0 4px">ভাইভা প্রস্তুতি</h2><small>প্রশ্নে চাপ দিয়ে উত্তর ও পরের সম্ভাব্য প্রশ্ন দেখুন</small></div>
 <div class="card"><p class="viva-note">এগুলো নমুনা উত্তর। ভাইভায় মুখস্থ না বলে নিজের কথায় বলবেন। কোম্পানির কাজের ধরন অনুযায়ী উত্তর সাজাবেন। যা জানেন না, তা সৎভাবে বলবেন।</p>
 <input id="vivaSearch" class="viva-search" type="search" placeholder="প্রশ্ন বা উত্তর খুঁজুন..." oninput="renderViva()">
 <select id="vivaCat" class="viva-cat" onchange="renderViva()"><option value="">সব বিভাগ</option>${VIVA_CATS.map((c,i)=>`<option value="${i}">${c}</option>`).join("")}</select>
-<div id="vivaCount" class="viva-note"></div><div id="vivaList"></div></div>
-<button class="btn g" onclick="home()">← মূল পাতায় ফিরে যান</button>`;
+<div id="vivaCount" class="viva-note"></div><div id="vivaList"></div></div>`,menu);
 renderViva();
 }
 function renderViva(){
@@ -68,43 +91,48 @@ const c=$("vivaCat")?.value??"";
 const txt=x=>x.q+" "+x.a+" "+(x.f||[]).map(txt).join(" ");
 const filtered=VIVA.filter(x=>(c===""||VIVA_CATS.indexOf(x.cat)===+c)&&(!q||(txt(x)+" "+x.cat).toLowerCase().includes(q)));
 $("vivaCount").textContent=`${bn(filtered.length)}টি প্রশ্ন পাওয়া গেছে`;
-const fu=(l,d)=>l&&l.length?`<div class="viva-fu"><div class="viva-fut">🔗 এরপর যা জিজ্ঞেস করতে পারে</div>${l.map(y=>`<details class="fu${d}"><summary>↳ ${y.q}</summary><div class="viva-answer">${y.a}</div>${fu(y.f,d+1)}</details>`).join("")}</div>`:"";
-$("vivaList").innerHTML=filtered.map(x=>`<div class="viva-item"><details><summary>${bn(x.n)}. ${x.q}</summary><div class="viva-answer">${x.a}</div>${fu(x.f,1)}</details></div>`).join("")||`<p class="viva-note">কোনো প্রশ্ন পাওয়া যায়নি। অন্য শব্দ দিয়ে খুঁজুন।</p>`;
+$("vivaList").innerHTML=filtered.map(x=>`<div class="viva-item"><details><summary>${bn(x.n)}. ${x.q}</summary><div class="viva-answer">${x.a}</div>${vfu(x.f,1)}</details></div>`).join("")||`<p class="viva-note">কোনো প্রশ্ন পাওয়া যায়নি। অন্য শব্দ দিয়ে খুঁজুন।</p>`;
 }
-function home(){clearInterval(S.t);A.innerHTML=`<div class="hero"><h2 style="margin:0 0 4px">পরীক্ষা নির্ধারণ</h2><small>আপনার পছন্দ মতো অধ্যায়, সময় ও নম্বর ঠিক করুন</small></div>
+function examSetup(){clearInterval(S.t);S.running=false;show(`<div class="hero"><h2 style="margin:0 0 4px">📝 পরীক্ষা</h2><small>আপনার পছন্দ মতো অধ্যায়, সময় ও নম্বর ঠিক করুন</small></div>
 <div class="grid"><div class="card"><label class="f">⏰ সময়<select id="tm">${[10,20,30,60,120].map(m=>`<option value="${m}" ${m==30?"selected":""}>${bn(m)} মিনিট</option>`).join("")}</select></label></div>
-<div class="card"><label class="f">📚 প্রশ্নের সংখ্যা<select id="qn">${[10,20,50,100,150,200].map(m=>`<option value="${m}">${bn(m)}টি</option>`).join("")}</select></label></div>
+<div class="card"><label class="f">📚 MCQ-র সংখ্যা<select id="qn">${[10,20,50,100,150,200].map(m=>`<option value="${m}">${bn(m)}টি</option>`).join("")}</select></label></div>
 <div class="card"><label class="f">✅ প্রতি প্রশ্নে মার্ক<select id="mk"><option>1</option><option>2</option></select></label></div>
 <div class="card"><label class="f">❌ নেগেটিভ মার্কিং<select id="ng"><option value="0">০</option><option value="0.25" selected>−০.২৫</option><option value="0.5">−০.৫</option></select></label></div></div>
 <div class="card"><div class="top"><span>অধ্যায়সমূহ</span><a href="#" onclick="all();return false" style="color:var(--pr)">সব নির্বাচন</a></div>${chapList()}</div>
-<button class="btn" onclick="start()">পরীক্ষা শুরু করুন</button><button class="btn g" onclick="study()">📖 পড়াশোনা (উত্তর ও ব্যাখ্যাসহ)</button><button class="btn g" onclick="vivaHome()">ভাইভা প্রস্তুতি (২০০টি প্রশ্নোত্তর)</button>`}
-function start(){const p=picked();if(!p.length)return alert("অন্তত একটি অধ্যায় নির্বাচন করুন");
-let q=Q.filter(x=>p.includes(x[0])).sort(()=>Math.random()-.5).slice(0,+$("qn").value);
-S={q,a:q.map(()=>-1),i:0,mk:+$("mk").value,ng:+$("ng").value,left:+$("tm").value*60};
+<div class="card"><label class="row" style="border:0"><input type="checkbox" id="vz"><span><b>🎤 ভাইভা প্রস্তুতির প্রশ্ন যোগ করুন</b><br><small class="viva-note">ঐচ্ছিক। MCQ-র পরে ভাইভার প্রশ্ন আসবে। উত্তর ভেবে "উত্তর দেখুন" চাপুন, তারপর নিজেই নিজেকে মূল্যায়ন করুন। এগুলো MCQ নম্বরে যোগ হবে না।</small></span></label>
+<label class="f">ভাইভা প্রশ্নের সংখ্যা<select id="vzn">${[5,10,20,50,100].map(m=>`<option value="${m}" ${m==10?"selected":""}>${bn(m)}টি</option>`).join("")}<option value="all">সবগুলো</option></select></label></div>
+<button class="btn" onclick="start()">পরীক্ষা শুরু করুন</button>`,menu)}
+function start(){const p=picked(),useV=$("vz").checked;if(!p.length&&!useV)return alert("অন্তত একটি অধ্যায় নির্বাচন করুন, অথবা ভাইভা প্রশ্ন যোগ করুন");
+let q=shuf(Q.filter(x=>p.includes(x[0]))).slice(0,+$("qn").value);
+let vv=[];if(useV){const n=$("vzn").value;vv=shuf(VIVA);if(n!=="all")vv=vv.slice(0,+n)}
+S={q,vv,a:q.map(()=>-1),va:vv.map(()=>-1),sh:vv.map(()=>false),i:0,mk:+$("mk").value,ng:+$("ng").value,left:+$("tm").value*60,running:true};
 S.t=setInterval(()=>{S.left--;tick();if(S.left<=0)finish()},1000);exam()}
 function tick(){const e=$("tmr");if(e)e.textContent=bn(String(Math.floor(S.left/60)).padStart(2,"0"))+":"+bn(String(S.left%60).padStart(2,"0"))}
-function exam(){const x=S.q[S.i];A.innerHTML=`<div class="card"><div class="top"><span>প্রশ্ন ${bn(S.i+1)}/${bn(S.q.length)}</span><span class="tm">⏱ <span id="tmr"></span></span></div></div>
-<div class="card"><b>${x[1]}</b>${x[2].map((o,k)=>`<button class="opt ${S.a[S.i]==k?"sel":""}" onclick="ans(${k})">${"কখগঘ"[k]}. ${o}</button>`).join("")}</div>
-<div class="nav"><button class="btn g" onclick="go(-1)" ${S.i?"":"disabled"}>← আগের</button><button class="btn g" onclick="go(1)" ${S.i<S.q.length-1?"":"disabled"}>পরের →</button></div>
-<button class="btn" onclick="if(confirm('পরীক্ষা জমা দিবেন?'))finish()">জমা দিন</button>`;tick()}
+function exam(){const T=S.q.length+S.vv.length,hd=`<div class="card"><div class="top"><span>প্রশ্ন ${bn(S.i+1)}/${bn(T)}</span><span class="tm">⏱ <span id="tmr"></span></span></div></div>`;
+let body;
+if(S.i<S.q.length){const x=S.q[S.i];body=`<div class="card"><b>${x[1]}</b>${x[2].map((o,k)=>`<button class="opt ${S.a[S.i]==k?"sel":""}" onclick="ans(${k})">${"কখগঘ"[k]}. ${o}</button>`).join("")}</div>`}
+else{const j=S.i-S.q.length,x=S.vv[j];body=`<div class="card"><span class="viva-note">🎤 ভাইভা প্রশ্ন (মৌখিক) — মনে মনে উত্তর দিন</span><p><b>${x.q}</b></p>${S.sh[j]?`<div class="viva-answer">${x.a}</div>${vfu(x.f,1)}<div class="nav"><button class="btn ${S.va[j]==1?"":"g"}" onclick="rate(1)">✅ পেরেছি</button><button class="btn ${S.va[j]==0?"":"g"}" onclick="rate(0)">❌ পারিনি</button></div>`:`<button class="btn" onclick="reveal()">উত্তর দেখুন</button>`}</div>`}
+show(hd+body+`<div class="nav"><button class="btn g" onclick="go(-1)" ${S.i?"":"disabled"}>← আগের</button><button class="btn g" onclick="go(1)" ${S.i<T-1?"":"disabled"}>পরের →</button></div><button class="btn" onclick="if(confirm('পরীক্ষা জমা দিবেন?'))finish()">জমা দিন</button>`,examSetup,true);tick()}
 function ans(k){S.a[S.i]=S.a[S.i]==k?-1:k;exam()}
+function reveal(){S.sh[S.i-S.q.length]=true;exam()}
+function rate(v){S.va[S.i-S.q.length]=v;exam()}
 function go(d){S.i+=d;exam()}
-function finish(){clearInterval(S.t);let c=0,w=0;S.q.forEach((x,i)=>{if(S.a[i]<0)return;S.a[i]==x[3]?c++:w++});
-const sc=Math.round((c*S.mk-w*S.ng)*100)/100;
-A.innerHTML=`<div class="card"><div class="big">${bn(sc)}</div><div class="st"><div>✅ সঠিক<br><b>${bn(c)}</b></div><div>❌ ভুল<br><b>${bn(w)}</b></div><div>⏭ বাদ<br><b>${bn(S.q.length-c-w)}</b></div></div></div>
-${S.q.map((x,i)=>book(x,i,S.a[i])).join("")}<button class="btn" onclick="home()">নতুন পরীক্ষা</button>`}
+function finish(){clearInterval(S.t);S.running=false;let c=0,w=0;S.q.forEach((x,i)=>{if(S.a[i]<0)return;S.a[i]==x[3]?c++:w++});
+const sc=Math.round((c*S.mk-w*S.ng)*100)/100,vy=S.va.filter(v=>v==1).length,vn=S.va.filter(v=>v==0).length;
+show((S.q.length?`<div class="card"><div class="big">${bn(sc)}</div><div class="st"><div>✅ সঠিক<br><b>${bn(c)}</b></div><div>❌ ভুল<br><b>${bn(w)}</b></div><div>⏭ বাদ<br><b>${bn(S.q.length-c-w)}</b></div></div></div>`:"")
++(S.vv.length?`<div class="card"><b>🎤 ভাইভা স্ব-মূল্যায়ন</b><div class="st"><div>✅ পেরেছি<br><b>${bn(vy)}</b></div><div>❌ পারিনি<br><b>${bn(vn)}</b></div><div>⏭ দেখিনি<br><b>${bn(S.vv.length-vy-vn)}</b></div></div></div>`:"")
++S.q.map((x,i)=>book(x,i,S.a[i])).join("")
++(S.vv.length?`<h3>ভাইভা প্রশ্নের উত্তর</h3>`+S.vv.map((x,j)=>`<div class="viva-item card"><details><summary>${bn(j+1)}. ${x.q} ${S.va[j]==1?"✅":S.va[j]==0?"❌":""}</summary><div class="viva-answer">${x.a}</div>${vfu(x.f,1)}</details></div>`).join(""):"")
++`<button class="btn" onclick="examSetup()">নতুন পরীক্ষা</button>`,menu)}
 function book(x,i,u){return`<div class="card"><b>${bn(i+1)}. ${x[1]}</b>${x[2].map((o,k)=>`<div class="opt ${k==x[3]?"ok":k==u?"no":""}">${"কখগঘ"[k]}. ${o}${k==x[3]?" ✓":k==u?" ✗":""}</div>`).join("")}${x[4]?`<div class="exp">💡 ${x[4]}</div>`:""}</div>`}
-function study(){A.innerHTML=`<div class="hero"><h2 style="margin:0">📖 পড়াশোনা</h2><small>অধ্যায় বেছে নিয়ে উত্তর ও ব্যাখ্যাসহ পড়ুন</small></div><div class="card">${chapList()}</div><button class="btn" onclick="read()">পড়া শুরু করুন</button><button class="btn g" onclick="home()">← ফিরে যান</button>`}
-function read(){const p=picked();if(!p.length)return alert("অন্তত একটি অধ্যায় নির্বাচন করুন");
-A.innerHTML=p.map(c=>`<h3>${CH[c]}</h3>`+Q.filter(x=>x[0]==c).map((x,i)=>book(x,i,-1)).join("")).join("")+`<button class="btn g" onclick="study()">← অধ্যায় তালিকা</button>`}
 const API="https://script.google.com/macros/s/AKfycbyccCrYpZvexzHcwLzHgNui7FyLHjMIFINXx3vaBm-IgpiJdyz95a1Qw1hrksdJif5R/exec";
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
 const en=s=>String(s).replace(/[০-৯]/g,d=>"০১২৩৪৫৬৭৮৯".indexOf(d));
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 async function call(o){const r=await fetch(API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(o)});return r.json()}
-function busy(t){A.innerHTML=`<div class="card" style="text-align:center;padding:30px 14px">${esc(t)}</div>`}
+function busy(t){$("nb").style.display="none";A.innerHTML=`<div class="card" style="text-align:center;padding:30px 14px">${esc(t)}</div>`}
 function loginScreen(msg){
-clearInterval(S.t);$("lo").style.display="none";
+clearInterval(S.t);S.running=false;$("nb").style.display="none";$("lo").style.display="none";
 const rid=store.get("mv_req");
 A.innerHTML=`<div class="hero"><h2 style="margin:0 0 4px">প্রবেশের অনুমতি</h2><small>পরীক্ষা দিতে নাম ও ফোন নম্বর দিয়ে অনুরোধ পাঠান। অ্যাপের মালিক আপনাকে একটি ওটিপি দেবেন।</small></div>
 <div class="card">${msg?`<p class="viva-note" style="color:var(--no);margin-top:0">${esc(msg)}</p>`:""}
@@ -138,7 +166,7 @@ catch(e){otpScreen(id,"ইন্টারনেট সংযোগ নেই ব
 async function loadData(tok){
 busy("প্রশ্ন লোড হচ্ছে...");
 try{const r=await call({action:"data",token:tok});
-if(r.ok){CH=r.d.CH;Q=r.d.Q;VIVA=r.d.VIVA;VIVA_CATS=r.d.VIVA_CATS;$("lo").style.display="";home()}
+if(r.ok){CH=r.d.CH;Q=r.d.Q;VIVA=r.d.VIVA;VIVA_CATS=r.d.VIVA_CATS;$("lo").style.display="";splash()}
 else if(r.err==="session"){store.del("mv_tok");loginScreen("সেশনের মেয়াদ শেষ। আবার অনুরোধ পাঠান।")}
 else{A.innerHTML=`<div class="card"><p>${esc(r.err||"ডেটা আনা যায়নি")}</p><button class="btn" onclick="loadData('${tok}')">আবার চেষ্টা করুন</button></div>`}}
 catch(e){A.innerHTML=`<div class="card"><p>ইন্টারনেট সংযোগ নেই বা সার্ভারে পৌঁছানো যায়নি।</p><button class="btn" onclick="loadData('${tok}')">আবার চেষ্টা করুন</button></div>`}}
