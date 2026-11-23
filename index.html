@@ -58,14 +58,14 @@ input,textarea{-webkit-user-select:text;user-select:text}
 @media (hover:hover) and (pointer:fine){#app,#app *{-webkit-user-select:text;user-select:text}#app button,#app summary,#app .mn,#app select{-webkit-user-select:none;user-select:none}}
 #sq{display:none;position:fixed;left:12px;right:12px;bottom:84px;z-index:20;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:16px;padding:12px;box-shadow:0 8px 28px rgba(0,0,0,.25);max-width:616px;margin:0 auto}
 #sq .t{font-size:15px;line-height:1.5;max-height:72px;overflow:auto;margin-bottom:8px;font-weight:700}
-#sq .r{display:flex;gap:8px}#sq button{flex:1;padding:11px 6px;border-radius:12px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font:inherit;font-weight:700;-webkit-user-select:none;user-select:none}
+#sq .r{display:flex;gap:8px;margin-bottom:8px}#sq .r:last-child{margin-bottom:0}#sq .r button:not(.p){font-size:13px}::highlight(sq){background:#ffd54d;color:#000}#sq button{flex:1;padding:11px 6px;border-radius:12px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font:inherit;font-weight:700;-webkit-user-select:none;user-select:none}
 #sq button.p{background:var(--pr);color:#fff;border-color:var(--pr)}
 </style>
 </head>
 <body>
 <header><span>BAKIR's Mechaverse</span><div><button id="lo" onclick="logout()" aria-label="বের হন" style="display:none">⎋</button><button id="lg" onclick="toggleLang()" aria-label="Language" style="font-size:14px;border:1px solid #fff8;border-radius:8px;padding:3px 8px;margin-right:6px">EN</button><button onclick="dk()" aria-label="Theme">◐</button></div></header>
 <main id="app"></main>
-<div id="sq"><div class="t" id="sqT"></div><div class="r"><button class="p" id="sqW" onclick="sqGo(0)"></button><button id="sqS" onclick="sqGo(1)"></button><button onclick="sqHide()">✕</button></div></div>
+<div id="sq"><div class="t" id="sqT"></div><div class="r" id="sqR1"><button onclick="sqStep(0,1)" id="sqL1"></button><button onclick="sqStep(1,1)" id="sqR1b"></button></div><div class="r" id="sqR2"><button onclick="sqStep(0,-1)" id="sqL2"></button><button onclick="sqStep(1,-1)" id="sqR2b"></button></div><div class="r"><button class="p" id="sqW" onclick="sqGo(0)"></button><button id="sqS" onclick="sqGo(1)"></button><button onclick="sqHide()">✕</button></div></div>
 <div id="nb"><button id="nbB" onclick="goBack()">← পিছনে</button><button id="nbH" onclick="goHome()">🏠 হোম</button></div>
 <script>
 (function(){const ok=t=>t&&t.closest&&t.closest("input,textarea");
@@ -201,25 +201,32 @@ else{A.innerHTML=`<div class="card"><p>${esc(r.err||L("ডেটা আনা �
 catch(e){A.innerHTML=`<div class="card"><p>${NET()}.</p><button class="btn" onclick="loadData('${tok}')">${L("আবার চেষ্টা করুন","Try again")}</button></div>`}}
 function logout(){if(!confirm(L("বের হতে চান?","Log out?")))return;store.del("mv_tok");CH=[];Q=[];VIVA=[];VIVA_CATS=[];loginScreen()}
 
-let SQ={w:"",s:""};
-function sqHide(){const e=document.getElementById("sq");if(e)e.style.display="none"}
-function sqGo(m){const t=(m?SQ.s:SQ.w).trim();if(!t)return;window.open("https://www.google.com/search?q="+encodeURIComponent(t),"_blank","noopener");sqHide()}
+let SQ={t:"",tk:null,a:0,b:0,node:null};
+const SQB=/^[\s,;:()\[\]{}"'“”‘’।?!.\-–—]+|[\s,;:()\[\]{}"'“”‘’।?!.\-–—]+$/g;
+function sqHide(){const e=document.getElementById("sq");if(e)e.style.display="none";try{CSS.highlights.delete("sq")}catch(x){}}
+function sqText(){if(SQ.tk){const t=SQ.node.data.slice(SQ.tk[SQ.a].s,SQ.tk[SQ.b].e);return t.replace(SQB,"")}return SQ.t}
+function sqPaint(){const T=sqText();document.getElementById("sqT").textContent=T;
+document.getElementById("sqW").textContent="🔍 "+L("গুগলে খুঁজুন","Search Google");
+const st=!!SQ.tk;["sqR1","sqR2"].forEach(i=>document.getElementById(i).style.display=st?"flex":"none");
+document.getElementById("sqS").style.display=st?"":"none";
+if(st){document.getElementById("sqL1").textContent="← "+L("বামে শব্দ যোগ","+ word left");document.getElementById("sqR1b").textContent=L("ডানে শব্দ যোগ","+ word right")+" →";
+document.getElementById("sqL2").textContent=L("বাম থেকে বাদ","− from left");document.getElementById("sqR2b").textContent=L("ডান থেকে বাদ","− from right");
+document.getElementById("sqS").textContent=L("পুরো বাক্য","Sentence");
+try{const r=document.createRange();r.setStart(SQ.node,SQ.tk[SQ.a].s);r.setEnd(SQ.node,SQ.tk[SQ.b].e);CSS.highlights.set("sq",new Highlight(r))}catch(x){}}
+document.getElementById("sq").style.display="block"}
+function sqStep(side,d){if(!SQ.tk)return;if(side===0){const v=SQ.a-d;if(v>=0&&v<=SQ.b)SQ.a=v}else{const v=SQ.b+d;if(v>=SQ.a&&v<SQ.tk.length)SQ.b=v}sqPaint()}
+function sqGo(m){let t=sqText();if(m&&SQ.tk){let a=SQ.a,b=SQ.b;const sd=/[।?!]|\.$/;while(a>0&&!sd.test(SQ.node.data.slice(SQ.tk[a-1].s,SQ.tk[a-1].e)))a--;while(b<SQ.tk.length-1&&!sd.test(SQ.node.data.slice(SQ.tk[b].s,SQ.tk[b].e)))b++;t=SQ.node.data.slice(SQ.tk[a].s,SQ.tk[b].e).replace(SQB,"")}
+t=t.trim();if(!t)return;window.open("https://www.google.com/search?q="+encodeURIComponent(t),"_blank","noopener");sqHide()}
 function sqAt(x,y){let r=null;if(document.caretRangeFromPoint)r=document.caretRangeFromPoint(x,y);else if(document.caretPositionFromPoint){const p=document.caretPositionFromPoint(x,y);if(p){r=document.createRange();r.setStart(p.offsetNode,p.offset)}}
-if(!r||r.startContainer.nodeType!==3)return null;const n=r.startContainer,t=n.data;let i=Math.min(r.startOffset,t.length-1);if(i<0)return null;
-const brk=/[\s,;:()\[\]{}"'“”‘’।?!.]/;if(brk.test(t[i])&&i>0&&!brk.test(t[i-1]))i--;if(brk.test(t[i]))return null;
-let a=i,b=i;while(a>0&&!brk.test(t[a-1]))a--;while(b<t.length-1&&!brk.test(t[b+1]))b++;
-let sa=i,sb=i;const sd=/[।?!\n]|\.\s/;while(sa>0&&!sd.test(t[sa-1]))sa--;while(sb<t.length-1&&!sd.test(t[sb]))sb++;
-return{w:t.slice(a,b+1),s:t.slice(sa,sb+1).replace(/\s+/g," ").trim()}}
-function sqSel(){try{const g=window.getSelection();if(!g||g.isCollapsed)return null;const t=g.toString().replace(/\s+/g," ").trim();if(!t||t.length>200)return null;const n=g.anchorNode&&(g.anchorNode.nodeType===3?g.anchorNode.parentElement:g.anchorNode);if(!n||!n.closest||!n.closest("#app")||n.closest("input,textarea"))return null;return{w:t,s:t}}catch(e){return null}}
-function sqShow(o){SQ=o;document.getElementById("sqT").textContent=o.w;document.getElementById("sqW").textContent="🔍 "+L("গুগলে খুঁজুন","Search Google");const ss=document.getElementById("sqS");ss.style.display="none";document.getElementById("sq").style.display="block"}
-document.addEventListener("mouseup",ev=>{if(!matchMedia("(pointer:fine)").matches||(S&&S.running))return;if(ev.target.closest&&ev.target.closest("#sq"))return;setTimeout(()=>{const o=sqSel();if(o)sqShow(o)},10)});
+if(!r||r.startContainer.nodeType!==3)return null;const n=r.startContainer,t=n.data;const tk=[];t.replace(/\S+/g,(m,i)=>{tk.push({s:i,e:i+m.length})});if(!tk.length)return null;
+const off=Math.min(r.startOffset,t.length-1);let k=tk.findIndex(z=>off>=z.s&&off<z.e);if(k<0)k=tk.findIndex(z=>z.s>=off);if(k<0)k=tk.length-1;
+if(!t.slice(tk[k].s,tk[k].e).replace(SQB,""))return null;return{node:n,tk,a:k,b:k,t:""}}
+function sqSel(){try{const g=window.getSelection();if(!g||g.isCollapsed)return null;const t=g.toString().replace(/\s+/g," ").trim();if(!t||t.length>200)return null;const n=g.anchorNode&&(g.anchorNode.nodeType===3?g.anchorNode.parentElement:g.anchorNode);if(!n||!n.closest||!n.closest("#app")||n.closest("input,textarea"))return null;return{tk:null,t:t}}catch(e){return null}}
+document.addEventListener("mouseup",ev=>{if(!matchMedia("(pointer:fine)").matches||(S&&S.running))return;if(ev.target.closest&&ev.target.closest("#sq"))return;setTimeout(()=>{const o=sqSel();if(o){SQ=o;sqPaint()}},10)});
 document.addEventListener("contextmenu",ev=>{try{if(S&&S.running)return;const t=ev.target;if(!t.closest||!t.closest("#app")||t.closest("input,textarea,button,select"))return;
-let o=sqSel()||sqAt(ev.clientX,ev.clientY);if(!o)return;SQ=o;
-document.getElementById("sqT").textContent=o.w;document.getElementById("sqW").textContent="🔍 "+L("গুগলে খুঁজুন","Search Google");
-const ss=document.getElementById("sqS");ss.textContent=L("পুরো বাক্য","Whole sentence");ss.style.display=o.s&&o.s!==o.w?"":"none";
-document.getElementById("sq").style.display="block"}catch(e){}},true);
+const o=sqSel()||sqAt(ev.clientX,ev.clientY);if(!o)return;SQ=o;sqPaint()}catch(e){}},true);
 document.addEventListener("click",ev=>{const e=document.getElementById("sq");if(e&&e.style.display==="block"&&!e.contains(ev.target))sqHide()},true);
-window.addEventListener("scroll",sqHide,{passive:true});
+window.addEventListener("scroll",()=>{if(!SQ.tk)sqHide()},{passive:true});
 applyLang();(function boot(){const t=store.get("mv_tok");t?loadData(t):loginScreen()})();
 </script>
 </body>
