@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BAKIR's Mechaverse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<style>
+:root{--bg:#f4f5fa;--card:#fff;--tx:#1b1f3a;--mu:#6b7090;--pr:#5b4bd5;--ok:#1a9d55;--no:#d33a3a;--bd:#dfe2ee;--hd:#0a5f80;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#10121c;--card:#1a1d2c;--tx:#eceefa;--mu:#9aa0c0;--bd:#2c3048;--hd:#0b4a66}}
+:root[data-theme=dark]{--bg:#10121c;--card:#1a1d2c;--tx:#eceefa;--mu:#9aa0c0;--bd:#2c3048;--hd:#0b4a66}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font-family:"Hind Siliguri",Roboto,Arial,"Noto Sans Bengali","Noto Sans",system-ui,sans-serif;font-size:16px}
+header{background:var(--hd);color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:20px}
+header button{background:none;border:0;color:#fff;font-size:20px}
+main{max-width:640px;margin:0 auto;padding:14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px;margin-bottom:12px}
+.hero{background:#151a33;color:#fff;border-radius:20px;padding:18px;margin-bottom:12px}.hero small{color:#b6bbdc}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label.f{font-size:14px;color:var(--mu);display:block}
+select{width:100%;margin-top:6px;padding:11px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font:inherit}
+.row{display:flex;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid var(--bd)}.row span{flex:1}.row b{font-size:13px;color:var(--pr);background:rgba(91,75,213,.12);padding:3px 9px;border-radius:99px}
+.row input{width:20px;height:20px}
+.btn{display:block;width:100%;padding:14px;border:0;border-radius:14px;background:var(--pr);color:#fff;font:inherit;font-weight:700;margin-top:10px}
+.btn.g{background:var(--card);color:var(--tx);border:1px solid var(--bd)}
+.opt{display:block;width:100%;text-align:left;padding:12px;margin-top:9px;border-radius:12px;border:1.5px solid var(--bd);background:var(--card);color:var(--tx);font:inherit}
+.opt.sel{border-color:var(--pr);background:rgba(91,75,213,.12)}.opt.ok{border-color:var(--ok);background:rgba(26,157,85,.14)}.opt.no{border-color:var(--no);background:rgba(211,58,58,.14)}
+.opt .katex{font-size:1.08em}.exp .katex,.card b .katex{font-size:1.04em}.opt,.exp{overflow-x:auto;overflow-wrap:anywhere}
+.top{display:flex;justify-content:space-between;font-weight:700}.tm{color:var(--no)}
+.exp{margin-top:8px;font-size:14px;color:var(--mu);border-left:3px solid var(--pr);padding-left:8px}
+.nav{display:flex;gap:10px}.nav .btn{margin-top:14px}
+.big{font-size:38px;font-weight:800;color:var(--pr);text-align:center}
+.st{display:flex;justify-content:space-around;text-align:center;margin:8px 0}
+
+.viva-search{width:100%;padding:12px;border:1px solid var(--bd);border-radius:12px;background:var(--card);color:var(--tx);font:inherit;margin:8px 0}
+.viva-cat{width:100%;margin:8px 0;padding:11px;border:1px solid var(--bd);border-radius:12px;background:var(--card);color:var(--tx);font:inherit}
+.viva-item{padding:12px 0;border-bottom:1px solid var(--bd)}
+.viva-item:last-child{border-bottom:0}
+.viva-item summary{font-weight:700;cursor:pointer;line-height:1.65;list-style-position:inside}
+.viva-fu{margin:8px 0 0 6px;padding-left:10px;border-left:3px solid #5b4bd5}.viva-fut{font-size:12px;opacity:.75;margin-bottom:4px}.viva-fu details{margin:6px 0}.viva-fu summary{font-size:14px;cursor:pointer}.viva-answer{white-space:pre-line;margin:10px 0 0 0;padding:11px 12px;border-radius:10px;background:rgba(91,75,213,.08);line-height:1.75;overflow-x:auto;overflow-wrap:anywhere}
+.viva-answer .katex{font-size:1.06em}.viva-answer .katex-display{margin:.55em 0;padding:2px 0;overflow-x:auto;overflow-y:hidden}
+.viva-note{font-size:14px;line-height:1.7;color:var(--mu)}
+main{padding-bottom:96px}
+#nb{display:none;position:fixed;left:0;right:0;bottom:0;gap:10px;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:1px solid var(--bd);z-index:9}
+#nb button{flex:1;padding:12px;border-radius:12px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font:inherit;font-weight:700}
+.mn{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:18px 16px;margin-bottom:12px;border-radius:16px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font:inherit}
+.mn:disabled{opacity:.5}.mn b{display:block;font-size:18px}.mn small{color:var(--mu);font-size:13px}
+.mn .mi{font-size:28px;min-width:40px;text-align:center}.mn.ch{padding:13px 14px}.mn.ch .mi{font-size:18px;font-weight:800;color:var(--pr);background:rgba(91,75,213,.12);border-radius:10px;padding:6px 0}.mn.ch b{font-size:16px}
+.splash{text-align:center;padding:90px 10px}.sp1{font-size:20px;color:var(--mu)}.sp2{font-size:34px;font-weight:800;color:var(--pr);margin:8px 0 14px;animation:fi 1s ease}.splash small{color:var(--mu)}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+html,body,*{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+input,textarea{-webkit-user-select:text;user-select:text}
+@media print{body{display:none!important}}
+#sq{display:none;position:fixed;left:12px;right:12px;bottom:84px;z-index:20;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:16px;padding:12px;box-shadow:0 8px 28px rgba(0,0,0,.25);max-width:616px;margin:0 auto}
+#sq .t{font-size:15px;line-height:1.5;max-height:72px;overflow:auto;margin-bottom:8px;font-weight:700}
+#sq .r{display:flex;gap:8px;margin-bottom:8px}#sq .r:last-child{margin-bottom:0}#sq .r button:not(.p){font-size:13px}::highlight(sq){background:#ffd54d;color:#000}#sq button{flex:1;padding:11px 6px;border-radius:12px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font:inherit;font-weight:700;-webkit-user-select:none;user-select:none}
+#sq button.p{background:var(--pr);color:#fff;border-color:var(--pr)}
+</style>
+</head>
+<body>
+<header><span>BAKIR's Mechaverse</span><div><button id="lo" onclick="logout()" aria-label="বের হন" style="display:none">⎋</button><button id="lg" onclick="toggleLang()" aria-label="Language" style="font-size:14px;border:1px solid #fff8;border-radius:8px;padding:3px 8px;margin-right:6px">EN</button><button onclick="dk()" aria-label="Theme">◐</button></div></header>
+<main id="app"></main>
+<div id="sq"><div class="t" id="sqT"></div><div class="r" id="sqR1"><button onclick="sqStep(0,1)" id="sqL1"></button><button onclick="sqStep(1,1)" id="sqR1b"></button></div><div class="r" id="sqR2"><button onclick="sqStep(0,-1)" id="sqL2"></button><button onclick="sqStep(1,-1)" id="sqR2b"></button></div><div class="r"><button class="p" id="sqW" onclick="sqGo(0)"></button><button id="sqS" onclick="sqGo(1)"></button><button onclick="sqHide()">✕</button></div></div>
+<div id="nb"><button id="nbB" onclick="goBack()">← পিছনে</button><button id="nbH" onclick="goHome()">🏠 হোম</button></div>
+<script>
+(function(){const ok=t=>t&&t.closest&&t.closest("input,textarea");
+["copy","cut","contextmenu","dragstart","selectstart"].forEach(e=>document.addEventListener(e,ev=>{if(ok(ev.target))return;ev.preventDefault()},true));
+document.addEventListener("keydown",ev=>{const k=(ev.key||"").toLowerCase();if(ev.key==="F12"||((ev.ctrlKey||ev.metaKey)&&["c","x","a","s","u","p"].includes(k))||(ev.ctrlKey&&ev.shiftKey&&["i","j","c"].includes(k))){if(!ok(ev.target)||k!=="c"&&k!=="x"&&k!=="a")ev.preventDefault()}},true)})();
+let LANG="bn";try{LANG=localStorage.getItem("mv_lang")||"bn"}catch(e){}
+const L=(b,e)=>LANG==="en"?e:b;
+const bn=n=>LANG==="en"?String(n):String(n).replace(/\d/g,d=>"০১২৩৪৫৬৭৮৯"[d]).replace("-","−");
+let CH=[],Q=[],VIVA=[],VIVA_CATS=[];
+const $=id=>document.getElementById(id),A=$("app");
+let S={},CUR=null;
+function dk(){const r=document.documentElement,d=r.dataset.theme==="dark"||(!r.dataset.theme&&matchMedia("(prefers-color-scheme:dark)").matches);r.dataset.theme=d?"light":"dark"}
+function applyLang(){document.documentElement.lang=LANG==="en"?"en":"bn";$("lg").textContent=LANG==="en"?"বাংলা":"EN";$("lo").setAttribute("aria-label",L("বের হন","Log out"));$("nbB").textContent=L("← পিছনে","← Back");$("nbH").textContent=L("🏠 হোম","🏠 Home")}
+function toggleLang(){LANG=LANG==="en"?"bn":"en";try{localStorage.setItem("mv_lang",LANG)}catch(e){}applyLang();if(CUR)CUR()}
+function chapList(){return CH.map((c,i)=>{const n=Q.filter(q=>q[0]==i).length;return `<label class="row" style="${n?"":"opacity:.5"}"><input type="checkbox" class="ck" value="${i}" ${n?"":"disabled"}><span>${L("অধ্যায়","Chapter")} ${bn(i+1)}: ${c}</span><b>${n?bn(n)+L("টি","")+"":L("শীঘ্রই","Soon")}</b></label>`}).join("")}
+function picked(){return[...document.querySelectorAll(".ck:checked")].map(e=>+e.value)}
+function all(){const c=[...document.querySelectorAll(".ck")],on=c.some(e=>!e.checked);c.forEach(e=>e.checked=on)}
+const shuf=a=>a.slice().sort(()=>Math.random()-.5);
+function mx(s,inl){s=s==null?"":String(s);
+if(s.indexOf("$")<0)return s;
+const rd=(t,d)=>{try{if(window.katex)return katex.renderToString(t,{throwOnError:false,strict:false,displayMode:d})}catch(e){}return esc(t)};
+const ps=s.split("\n").map(l=>{const m=l.match(/^\s*\$([^$]+)\$\s*$/);return m&&m[1].length>12&&!inl?{d:1,h:rd(m[1],true)}:{d:0,h:l.replace(/\$([^$]+)\$/g,(_,t)=>rd(t,false))}});
+let o="";ps.forEach((p,i)=>{if(i&&!p.d&&!ps[i-1].d)o+="\n";o+=p.h});return o}
+const vfu=(l,d)=>l&&l.length?`<div class="viva-fu"><div class="viva-fut">🔗 ${L("এরপর যা জিজ্ঞেস করতে পারে","Possible next questions")}</div>${l.map(y=>`<details class="fu${d}"><summary>↳ ${mx(y.q)}</summary><div class="viva-answer">${mx(y.a)}</div>${vfu(y.f,d+1)}</details>`).join("")}</div>`:"";
+let BK=null;
+function show(html,back,keep){A.innerHTML=html;BK=back||null;$("nb").style.display=back?"flex":"none";if(!keep)window.scrollTo(0,0)}
+function goBack(){if(S.running&&!confirm(L("পরীক্ষা ছেড়ে বের হবেন? উত্তর হারিয়ে যাবে।","Leave the exam? Your answers will be lost.")))return;if(S.running){clearInterval(S.t);S.running=false;S.i=0}if(BK)BK();else menu()}
+function goHome(){if(S.running&&!confirm(L("পরীক্ষা ছেড়ে বের হবেন? উত্তর হারিয়ে যাবে।","Leave the exam? Your answers will be lost.")))return;clearInterval(S.t);S.running=false;menu()}
+function splash(){CUR=splash;clearInterval(S.t);show(`<div class="splash"><div class="sp1">Welcome to</div><div class="sp2">BAKIR's Mechaverse</div><small>Mechanical Engineering | Power Engineering</small></div>`,null);setTimeout(()=>{if(document.querySelector(".splash"))menu()},1800)}
+function menu(){CUR=menu;clearInterval(S.t);S.running=false;
+show(`<div class="hero"><h2 style="margin:0 0 4px">BAKIR's Mechaverse</h2><small>${L("কী করতে চান?","What would you like to do?")}</small></div>
+<button class="mn" onclick="study()"><span class="mi">📖</span><span><b>${L("পড়াশোনা","Study")}</b><small>${L("অধ্যায় ভিত্তিক MCQ, উত্তর ও ব্যাখ্যাসহ","Chapter-wise MCQs with answers and explanations")}</small></span></button>
+<button class="mn" onclick="vivaHome()"><span class="mi">🎤</span><span><b>${L("ভাইভা প্রস্তুতি","Viva Preparation")}</b><small>${L("ভাইভার প্রশ্ন, উত্তর ও পরের সম্ভাব্য প্রশ্ন","Viva questions, answers and follow-up questions")}</small></span></button>
+<button class="mn" onclick="examSetup()"><span class="mi">📝</span><span><b>${L("পরীক্ষা","Exam")}</b><small>${L("সময় ও নম্বর ঠিক করে মডেল টেস্ট দিন","Set time and marks, then take a model test")}</small></span></button>`,null)}
+function study(){CUR=study;show(`<div class="hero"><h2 style="margin:0">📖 ${L("পড়াশোনা","Study")}</h2><small>${L("একটি অধ্যায়ে চাপ দিন, উত্তর ও ব্যাখ্যাসহ পড়ুন","Tap a chapter to read with answers and explanations")}</small></div>
+${CH.map((c,i)=>{const n=Q.filter(q=>q[0]==i).length;return `<button class="mn ch" ${n?`onclick="readCh(${i})"`:"disabled"}><span class="mi">${bn(i+1)}</span><span><b>${c}</b><small>${n?bn(n)+L("টি প্রশ্ন"," questions"):L("শীঘ্রই আসছে","Coming soon")}</small></span></button>`}).join("")}`,menu)}
+function readCh(c){CUR=()=>readCh(c);show(`<h3 style="margin:6px 0 10px">${CH[c]}</h3>`+Q.filter(x=>x[0]==c).map((x,i)=>book(x,i,-1)).join(""),study)}
+function vivaHome(){CUR=vivaHome;
+clearInterval(S.t);
+show(`<div class="hero"><h2 style="margin:0 0 4px">${L("ভাইভা প্রস্তুতি","Viva Preparation")}</h2><small>${L("প্রশ্নে চাপ দিয়ে উত্তর ও পরের সম্ভাব্য প্রশ্ন দেখুন","Tap a question to see the answer and possible next questions")}</small></div>
+<div class="card"><p class="viva-note">${L("এগুলো নমুনা উত্তর। ভাইভায় মুখস্থ না বলে নিজের কথায় বলবেন। কোম্পানির কাজের ধরন অনুযায়ী উত্তর সাজাবেন। যা জানেন না, তা সৎভাবে বলবেন।","These are sample answers. Say them in your own words instead of memorising. Adapt them to the company's work, and be honest about what you don't know.")}</p>
+<input id="vivaSearch" class="viva-search" type="search" placeholder="${L("প্রশ্ন বা উত্তর খুঁজুন...","Search questions or answers...")}" oninput="renderViva()">
+<select id="vivaCat" class="viva-cat" onchange="renderViva()"><option value="">${L("সব বিভাগ","All categories")}</option>${VIVA_CATS.map((c,i)=>`<option value="${i}">${c}</option>`).join("")}</select>
+<div id="vivaCount" class="viva-note"></div><div id="vivaList"></div></div>`,menu);
+renderViva();
+}
+function renderViva(){
+const q=$("vivaSearch")?.value.trim().toLowerCase()||"";
+const c=$("vivaCat")?.value??"";
+const txt=x=>x.q+" "+x.a+" "+(x.f||[]).map(txt).join(" ");
+const filtered=VIVA.filter(x=>(c===""||VIVA_CATS.indexOf(x.cat)===+c)&&(!q||(txt(x)+" "+x.cat).toLowerCase().includes(q)));
+$("vivaCount").textContent=bn(filtered.length)+L("টি প্রশ্ন পাওয়া গেছে"," questions found");
+$("vivaList").innerHTML=filtered.map(x=>`<div class="viva-item"><details><summary>${bn(x.n)}. ${mx(x.q)}</summary><div class="viva-answer">${mx(x.a)}</div>${vfu(x.f,1)}</details></div>`).join("")||`<p class="viva-note">${L("কোনো প্রশ্ন পাওয়া যায়নি। অন্য শব্দ দিয়ে খুঁজুন।","No questions found. Try other words.")}</p>`;
+}
+function examSetup(){CUR=examSetup;clearInterval(S.t);S.running=false;show(`<div class="hero"><h2 style="margin:0 0 4px">📝 ${L("পরীক্ষা","Exam")}</h2><small>${L("আপনার পছন্দ মতো অধ্যায়, সময় ও নম্বর ঠিক করুন","Choose chapters, time and marks as you like")}</small></div>
+<div class="grid"><div class="card"><label class="f">⏰ ${L("সময়","Time")}<select id="tm">${[10,20,30,60,120].map(m=>`<option value="${m}" ${m==30?"selected":""}>${bn(m)} ${L("মিনিট","min")}</option>`).join("")}</select></label></div>
+<div class="card"><label class="f">📚 ${L("MCQ-র সংখ্যা","Number of MCQs")}<select id="qn">${[10,20,50,100,150,200].map(m=>`<option value="${m}">${bn(m)}${L("টি","")}</option>`).join("")}</select></label></div>
+<div class="card"><label class="f">✅ ${L("প্রতি প্রশ্নে মার্ক","Marks per question")}<select id="mk"><option value="1">${bn(1)}</option><option value="2">${bn(2)}</option></select></label></div>
+<div class="card"><label class="f">❌ ${L("নেগেটিভ মার্কিং","Negative marking")}<select id="ng"><option value="0">${bn(0)}</option><option value="0.25" selected>${bn("-0.25")}</option><option value="0.5">${bn("-0.5")}</option></select></label></div></div>
+<div class="card"><div class="top"><span>${L("অধ্যায়সমূহ","Chapters")}</span><a href="#" onclick="all();return false" style="color:var(--pr)">${L("সব নির্বাচন","Select all")}</a></div>${chapList()}</div>
+<div class="card"><label class="row" style="border:0"><input type="checkbox" id="vz"><span><b>🎤 ${L("ভাইভা প্রস্তুতির প্রশ্ন যোগ করুন","Add viva questions")}</b><br><small class="viva-note">${L("ঐচ্ছিক। MCQ-র পরে ভাইভার প্রশ্ন আসবে। উত্তর ভেবে \"উত্তর দেখুন\" চাপুন, তারপর নিজেই নিজেকে মূল্যায়ন করুন। এগুলো MCQ নম্বরে যোগ হবে না।","Optional. Viva questions come after the MCQs. Think of your answer, tap \"Show answer\", then rate yourself. They are not added to the MCQ score.")}</small></span></label>
+<label class="f">${L("ভাইভা প্রশ্নের সংখ্যা","Number of viva questions")}<select id="vzn">${[5,10,20,50,100].map(m=>`<option value="${m}" ${m==10?"selected":""}>${bn(m)}${L("টি","")}</option>`).join("")}<option value="all">${L("সবগুলো","All")}</option></select></label></div>
+<button class="btn" onclick="start()">${L("পরীক্ষা শুরু করুন","Start exam")}</button>`,menu)}
+function start(){const p=picked(),useV=$("vz").checked;if(!p.length&&!useV)return alert(L("অন্তত একটি অধ্যায় নির্বাচন করুন, অথবা ভাইভা প্রশ্ন যোগ করুন","Select at least one chapter, or add viva questions"));
+let q=shuf(Q.filter(x=>p.includes(x[0]))).slice(0,+$("qn").value);
+let vv=[];if(useV){const n=$("vzn").value;vv=shuf(VIVA);if(n!=="all")vv=vv.slice(0,+n)}
+S={q,vv,a:q.map(()=>-1),va:vv.map(()=>-1),sh:vv.map(()=>false),i:0,mk:+$("mk").value,ng:+$("ng").value,left:+$("tm").value*60,running:true};
+S.t=setInterval(()=>{S.left--;tick();if(S.left<=0)finish()},1000);exam()}
+function tick(){const e=$("tmr");if(e)e.textContent=bn(String(Math.floor(S.left/60)).padStart(2,"0"))+":"+bn(String(S.left%60).padStart(2,"0"))}
+const OL=()=>LANG==="en"?"ABCD":"কখগঘ";
+function exam(){CUR=exam;const T=S.q.length+S.vv.length,hd=`<div class="card"><div class="top"><span>${L("প্রশ্ন","Question")} ${bn(S.i+1)}/${bn(T)}</span><span class="tm">⏱ <span id="tmr"></span></span></div></div>`;
+let body;
+if(S.i<S.q.length){const x=S.q[S.i];body=`<div class="card"><b>${mx(x[1],1)}</b>${x[2].map((o,k)=>`<button class="opt ${S.a[S.i]==k?"sel":""}" onclick="ans(${k})">${OL()[k]}. ${mx(o,1)}</button>`).join("")}</div>`}
+else{const j=S.i-S.q.length,x=S.vv[j];body=`<div class="card"><span class="viva-note">🎤 ${L("ভাইভা প্রশ্ন (মৌখিক) — মনে মনে উত্তর দিন","Viva question (oral) — answer in your mind")}</span><p><b>${mx(x.q)}</b></p>${S.sh[j]?`<div class="viva-answer">${mx(x.a)}</div>${vfu(x.f,1)}<div class="nav"><button class="btn ${S.va[j]==1?"":"g"}" onclick="rate(1)">✅ ${L("পেরেছি","I knew it")}</button><button class="btn ${S.va[j]==0?"":"g"}" onclick="rate(0)">❌ ${L("পারিনি","I didn't")}</button></div>`:`<button class="btn" onclick="reveal()">${L("উত্তর দেখুন","Show answer")}</button>`}</div>`}
+show(hd+body+`<div class="nav"><button class="btn g" onclick="go(-1)" ${S.i?"":"disabled"}>${L("← আগের","← Previous")}</button><button class="btn g" onclick="go(1)" ${S.i<T-1?"":"disabled"}>${L("পরের →","Next →")}</button></div><button class="btn" onclick="if(confirm('${L("পরীক্ষা জমা দিবেন?","Submit the exam?")}'))finish()">${L("জমা দিন","Submit")}</button>`,examSetup,true);tick()}
+function ans(k){S.a[S.i]=S.a[S.i]==k?-1:k;exam()}
+function reveal(){S.sh[S.i-S.q.length]=true;exam()}
+function rate(v){S.va[S.i-S.q.length]=v;exam()}
+function go(d){S.i+=d;exam()}
+function finish(){CUR=finish;clearInterval(S.t);S.running=false;let c=0,w=0;S.q.forEach((x,i)=>{if(S.a[i]<0)return;S.a[i]==x[3]?c++:w++});
+const sc=Math.round((c*S.mk-w*S.ng)*100)/100,vy=S.va.filter(v=>v==1).length,vn=S.va.filter(v=>v==0).length;
+show((S.q.length?`<div class="card"><div class="big">${bn(sc)}</div><div class="st"><div>✅ ${L("সঠিক","Correct")}<br><b>${bn(c)}</b></div><div>❌ ${L("ভুল","Wrong")}<br><b>${bn(w)}</b></div><div>⏭ ${L("বাদ","Skipped")}<br><b>${bn(S.q.length-c-w)}</b></div></div></div>`:"")
++(S.vv.length?`<div class="card"><b>🎤 ${L("ভাইভা স্ব-মূল্যায়ন","Viva self-assessment")}</b><div class="st"><div>✅ ${L("পেরেছি","Knew it")}<br><b>${bn(vy)}</b></div><div>❌ ${L("পারিনি","Didn't")}<br><b>${bn(vn)}</b></div><div>⏭ ${L("দেখিনি","Not rated")}<br><b>${bn(S.vv.length-vy-vn)}</b></div></div></div>`:"")
++S.q.map((x,i)=>book(x,i,S.a[i])).join("")
++(S.vv.length?`<h3>${L("ভাইভা প্রশ্নের উত্তর","Viva answers")}</h3>`+S.vv.map((x,j)=>`<div class="viva-item card"><details><summary>${bn(j+1)}. ${mx(x.q)} ${S.va[j]==1?"✅":S.va[j]==0?"❌":""}</summary><div class="viva-answer">${mx(x.a)}</div>${vfu(x.f,1)}</details></div>`).join(""):"")
++`<button class="btn" onclick="examSetup()">${L("নতুন পরীক্ষা","New exam")}</button>`,menu)}
+function book(x,i,u){return`<div class="card"><b>${bn(i+1)}. ${mx(x[1],1)}</b>${x[2].map((o,k)=>`<div class="opt ${k==x[3]?"ok":k==u?"no":""}">${OL()[k]}. ${mx(o,1)}${k==x[3]?" ✓":k==u?" ✗":""}</div>`).join("")}${x[4]?`<div class="exp">💡 ${mx(x[4],1)}</div>`:""}</div>`}
+const API="https://script.google.com/macros/s/AKfycbyccCrYpZvexzHcwLzHgNui7FyLHjMIFINXx3vaBm-IgpiJdyz95a1Qw1hrksdJif5R/exec";
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+let expiryTimer=null;
+function clearExpiryTimer(){if(expiryTimer!==null){clearTimeout(expiryTimer);expiryTimer=null}}
+function enforceExpiry(){
+clearExpiryTimer();
+const tok=store.get("mv_tok"),exp=Number(store.get("mv_exp")||0);
+if(!tok||!exp)return true;
+const left=exp-Date.now();
+if(left<=0){store.del("mv_tok");store.del("mv_exp");CH=[];Q=[];VIVA=[];VIVA_CATS=[];loginScreen(L("অ্যাক্সেসের মেয়াদ শেষ হয়েছে। আবার প্রবেশ করতে নতুন OTP নিন।","Access has expired. Request a new OTP to sign in again."));return false}
+// Browser timeout-এর সর্বোচ্চ সীমা (~24.8 দিন) মেনে বড় মেয়াদেও পুনরায় পরীক্ষা।
+expiryTimer=setTimeout(enforceExpiry,Math.min(left,2147480000));
+return true
+}
+const en=s=>String(s).replace(/[০-৯]/g,d=>"০১২৩৪৫৬৭৮৯".indexOf(d));
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+async function call(o){const r=await fetch(API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(o)});return r.json()}
+const NET=()=>L("ইন্টারনেট সংযোগ নেই বা সার্ভারে পৌঁছানো যায়নি","No internet connection or the server could not be reached");
+function busy(t){$("nb").style.display="none";A.innerHTML=`<div class="card" style="text-align:center;padding:30px 14px">${esc(t)}</div>`}
+function loginScreen(msg){CUR=()=>loginScreen(msg);
+clearExpiryTimer();clearInterval(S.t);S.running=false;$("nb").style.display="none";$("lo").style.display="none";
+const rid=store.get("mv_req");
+A.innerHTML=`<div class="hero"><h2 style="margin:0 0 4px">${L("প্রবেশের অনুমতি","Request Access")}</h2><small>${L("পরীক্ষা দিতে নাম ও ফোন নম্বর দিয়ে অনুরোধ পাঠান। অ্যাপের মালিক আপনাকে একটি ওটিপি দেবেন।","Send a request with your name and phone number. The app owner will give you an OTP.")}</small></div>
+<div class="card">${msg?`<p class="viva-note" style="color:var(--no);margin-top:0">${esc(msg)}</p>`:""}
+<label class="f">${L("আপনার নাম","Your name")}<input id="lgN" class="viva-search" autocomplete="name" maxlength="60"></label>
+<label class="f">${L("ফোন নম্বর","Phone number")}<input id="lgP" class="viva-search" type="tel" inputmode="tel" autocomplete="tel" maxlength="20"></label>
+<button class="btn" id="lgB" onclick="doRequest()">${L("অনুরোধ পাঠান","Send request")}</button>
+${rid?`<button class="btn g" onclick="otpScreen('${esc(rid)}')">${L("আমার কাছে ওটিপি আছে","I already have an OTP")}</button>`:""}</div>`}
+async function doRequest(){
+const n=$("lgN").value.trim(),p=en($("lgP").value).trim();
+if(n.length<2)return alert(L("নাম লিখুন","Enter your name"));
+if(p.replace(/\D/g,"").length<6)return alert(L("সঠিক ফোন নম্বর দিন","Enter a valid phone number"));
+$("lgB").disabled=true;$("lgB").textContent=L("পাঠানো হচ্ছে...","Sending...");
+try{const r=await call({action:"request",name:n,phone:p});
+if(r.ok){store.set("mv_req",r.id);otpScreen(r.id,L("অনুরোধ পাঠানো হয়েছে। মালিকের কাছ থেকে ওটিপি নিয়ে নিচে লিখুন।","Request sent. Get the OTP from the owner and enter it below."))}
+else{loginScreen(r.err||L("কিছু একটা ভুল হয়েছে","Something went wrong"))}}
+catch(e){loginScreen(NET())}}
+function otpScreen(id,msg){CUR=()=>otpScreen(id,msg);
+A.innerHTML=`<div class="hero"><h2 style="margin:0 0 4px">${L("ওটিপি দিন","Enter OTP")}</h2><small>${L("মালিকের কাছ থেকে পাওয়া ৬ সংখ্যার ওটিপি লিখুন (১০ মিনিট বৈধ)।","Enter the 6-digit OTP from the owner (valid for 10 minutes).")}</small></div>
+<div class="card">${msg?`<p class="viva-note" style="margin-top:0">${esc(msg)}</p>`:""}
+<input id="otp" class="viva-search" type="tel" inputmode="numeric" maxlength="6" placeholder="------" style="text-align:center;font-size:24px;letter-spacing:6px" autocomplete="one-time-code">
+<button class="btn" id="otB" onclick="doVerify('${esc(id)}')">${L("প্রবেশ করুন","Enter")}</button>
+<button class="btn g" onclick="store.del('mv_req');loginScreen()">${L("← নতুন অনুরোধ","← New request")}</button></div>`}
+async function doVerify(id){
+const o=en($("otp").value).replace(/\D/g,"");
+if(o.length!==6)return alert(L("৬ সংখ্যার ওটিপি দিন","Enter the 6-digit OTP"));
+$("otB").disabled=true;$("otB").textContent=L("যাচাই হচ্ছে...","Verifying...");
+try{const r=await call({action:"verify",id,otp:o});
+if(r.ok){store.set("mv_tok",r.token);if(r.expiresAt)store.set("mv_exp",String(r.expiresAt));store.del("mv_req");loadData(r.token)}
+else{otpScreen(id,r.err||L("ওটিপি ভুল","Wrong OTP"))}}
+catch(e){otpScreen(id,NET())}}
+async function loadData(tok){
+busy(L("প্রশ্ন লোড হচ্ছে...","Loading questions..."));
+try{const r=await call({action:"data",token:tok});
+if(r.ok){CH=r.d.CH;Q=r.d.Q;VIVA=r.d.VIVA;VIVA_CATS=r.d.VIVA_CATS;if(r.expiresAt)store.set("mv_exp",String(r.expiresAt));$("lo").style.display="";if(enforceExpiry())splash()}
+else if(r.err==="session"){store.del("mv_tok");store.del("mv_exp");loginScreen(L("অ্যাক্সেসের মেয়াদ শেষ। আবার প্রবেশ করতে নতুন OTP নিন।","Access expired. Request a new OTP to sign in again."))}
+else{A.innerHTML=`<div class="card"><p>${esc(r.err||L("ডেটা আনা যায়নি","Could not load data"))}</p><button class="btn" onclick="loadData('${tok}')">${L("আবার চেষ্টা করুন","Try again")}</button></div>`}}
+catch(e){A.innerHTML=`<div class="card"><p>${NET()}.</p><button class="btn" onclick="loadData('${tok}')">${L("আবার চেষ্টা করুন","Try again")}</button></div>`}}
+function logout(){if(!confirm(L("বের হতে চান?","Log out?")))return;clearExpiryTimer();store.del("mv_tok");store.del("mv_exp");CH=[];Q=[];VIVA=[];VIVA_CATS=[];loginScreen()}
+
+let SQ={t:"",tk:null,a:0,b:0,node:null};
+const SQB=/^[\s,;:()\[\]{}"'“”‘’।?!.\-–—]+|[\s,;:()\[\]{}"'“”‘’।?!.\-–—]+$/g;
+function sqHide(){const e=document.getElementById("sq");if(e)e.style.display="none";try{CSS.highlights.delete("sq")}catch(x){}}
+function sqText(){if(SQ.tk){const t=SQ.node.data.slice(SQ.tk[SQ.a].s,SQ.tk[SQ.b].e);return t.replace(SQB,"")}return SQ.t}
+function sqPaint(){const T=sqText();document.getElementById("sqT").textContent=T;
+document.getElementById("sqW").textContent="🔍 "+L("গুগলে খুঁজুন","Search Google");
+const st=!!SQ.tk;["sqR1","sqR2"].forEach(i=>document.getElementById(i).style.display=st?"flex":"none");
+document.getElementById("sqS").style.display=st?"":"none";
+if(st){document.getElementById("sqL1").textContent="← "+L("বামে শব্দ যোগ","+ word left");document.getElementById("sqR1b").textContent=L("ডানে শব্দ যোগ","+ word right")+" →";
+document.getElementById("sqL2").textContent=L("বাম থেকে বাদ","− from left");document.getElementById("sqR2b").textContent=L("ডান থেকে বাদ","− from right");
+document.getElementById("sqS").textContent=L("পুরো বাক্য","Sentence");
+try{const r=document.createRange();r.setStart(SQ.node,SQ.tk[SQ.a].s);r.setEnd(SQ.node,SQ.tk[SQ.b].e);CSS.highlights.set("sq",new Highlight(r))}catch(x){}}
+document.getElementById("sq").style.display="block"}
+function sqStep(side,d){if(!SQ.tk)return;if(side===0){const v=SQ.a-d;if(v>=0&&v<=SQ.b)SQ.a=v}else{const v=SQ.b+d;if(v>=SQ.a&&v<SQ.tk.length)SQ.b=v}sqPaint()}
+function sqGo(m){let t=sqText();if(m&&SQ.tk){let a=SQ.a,b=SQ.b;const sd=/[।?!]|\.$/;while(a>0&&!sd.test(SQ.node.data.slice(SQ.tk[a-1].s,SQ.tk[a-1].e)))a--;while(b<SQ.tk.length-1&&!sd.test(SQ.node.data.slice(SQ.tk[b].s,SQ.tk[b].e)))b++;t=SQ.node.data.slice(SQ.tk[a].s,SQ.tk[b].e).replace(SQB,"")}
+t=t.trim();if(!t)return;window.open("https://www.google.com/search?q="+encodeURIComponent(t),"_blank","noopener");sqHide()}
+function sqAt(x,y){let r=null;if(document.caretRangeFromPoint)r=document.caretRangeFromPoint(x,y);else if(document.caretPositionFromPoint){const p=document.caretPositionFromPoint(x,y);if(p){r=document.createRange();r.setStart(p.offsetNode,p.offset)}}
+if(!r||r.startContainer.nodeType!==3)return null;const n=r.startContainer,t=n.data;const tk=[];t.replace(/\S+/g,(m,i)=>{tk.push({s:i,e:i+m.length})});if(!tk.length)return null;
+const off=Math.min(r.startOffset,t.length-1);let k=tk.findIndex(z=>off>=z.s&&off<z.e);if(k<0)k=tk.findIndex(z=>z.s>=off);if(k<0)k=tk.length-1;
+if(!t.slice(tk[k].s,tk[k].e).replace(SQB,""))return null;return{node:n,tk,a:k,b:k,t:""}}
+function sqSel(){try{const g=window.getSelection();if(!g||g.isCollapsed)return null;const t=g.toString().replace(/\s+/g," ").trim();if(!t||t.length>200)return null;const n=g.anchorNode&&(g.anchorNode.nodeType===3?g.anchorNode.parentElement:g.anchorNode);if(!n||!n.closest||!n.closest("#app")||n.closest("input,textarea"))return null;return{tk:null,t:t}}catch(e){return null}}
+let MD=null;const sqOk=t=>t&&t.closest&&t.closest("#app")&&!t.closest("input,textarea,button,select,summary");
+document.addEventListener("mousedown",ev=>{MD=null;if(!matchMedia("(pointer:fine)").matches||(S&&S.running)||ev.button!==0||!sqOk(ev.target))return;const o=sqAt(ev.clientX,ev.clientY);if(o){o.x=ev.clientX;o.y=ev.clientY;MD=o}});
+document.addEventListener("mouseup",ev=>{const m=MD;MD=null;if(!m||(S&&S.running))return;if(ev.target.closest&&ev.target.closest("#sq"))return;
+const moved=Math.abs(ev.clientX-m.x)+Math.abs(ev.clientY-m.y)>6;if(!moved)return;const u=sqAt(ev.clientX,ev.clientY);
+const pick=(u&&u.node===m.node)?{a:Math.min(m.a,u.a),b:Math.max(m.b,u.b)}:{a:m.a,b:m.b};SQ={node:m.node,tk:m.tk,a:pick.a,b:pick.b,t:""};window._sqT=Date.now();sqPaint()});
+document.addEventListener("dblclick",ev=>{if(!matchMedia("(pointer:fine)").matches||(S&&S.running)||!sqOk(ev.target))return;const o=sqAt(ev.clientX,ev.clientY);if(o){SQ=o;window._sqT=Date.now();sqPaint()}});
+document.addEventListener("contextmenu",ev=>{try{if(S&&S.running)return;const t=ev.target;if(!t.closest||!t.closest("#app")||t.closest("input,textarea,button,select"))return;
+const o=sqAt(ev.clientX,ev.clientY);if(!o)return;SQ=o;sqPaint()}catch(e){}},true);
+document.addEventListener("click",ev=>{if(Date.now()-(window._sqT||0)<400)return;const e=document.getElementById("sq");if(e&&e.style.display==="block"&&!e.contains(ev.target))sqHide()},true);
+window.addEventListener("scroll",()=>{if(!SQ.tk)sqHide()},{passive:true});
+window.addEventListener("focus",enforceExpiry);document.addEventListener("visibilitychange",()=>{if(!document.hidden)enforceExpiry()});
+applyLang();(function boot(){const t=store.get("mv_tok");t?loadData(t):loginScreen()})();
+</script>
+</body>
+</html>
