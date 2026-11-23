@@ -29,6 +29,7 @@ select{width:100%;margin-top:6px;padding:11px;border-radius:12px;border:1px soli
 .btn.g{background:var(--card);color:var(--tx);border:1px solid var(--bd)}
 .opt{display:block;width:100%;text-align:left;padding:12px;margin-top:9px;border-radius:12px;border:1.5px solid var(--bd);background:var(--card);color:var(--tx);font:inherit}
 .opt.sel{border-color:var(--pr);background:rgba(91,75,213,.12)}.opt.ok{border-color:var(--ok);background:rgba(26,157,85,.14)}.opt.no{border-color:var(--no);background:rgba(211,58,58,.14)}
+.opt .katex{font-size:1.08em}.exp .katex,.card b .katex{font-size:1.04em}.opt,.exp{overflow-x:auto;overflow-wrap:anywhere}
 .top{display:flex;justify-content:space-between;font-weight:700}.tm{color:var(--no)}
 .exp{margin-top:8px;font-size:14px;color:var(--mu);border-left:3px solid var(--pr);padding-left:8px}
 .nav{display:flex;gap:10px}.nav .btn{margin-top:14px}
@@ -77,18 +78,10 @@ function chapList(){return CH.map((c,i)=>{const n=Q.filter(q=>q[0]==i).length;re
 function picked(){return[...document.querySelectorAll(".ck:checked")].map(e=>+e.value)}
 function all(){const c=[...document.querySelectorAll(".ck")],on=c.some(e=>!e.checked);c.forEach(e=>e.checked=on)}
 const shuf=a=>a.slice().sort(()=>Math.random()-.5);
-function mx(s){s=s==null?"":String(s);
-// Render plain engineering formulas in MCQ text/options using the same KaTeX renderer as Viva.
-if(s.indexOf("$")<0){
-const atom="[0-9A-Za-zηδΔλμωΩθπσφΨΞΣ]+(?:_[A-Za-z0-9]+)?";
-const op="(?:=|≤|≥|<|>|/|−|-|\\+|×|÷)";
-const expr=new RegExp(atom+"(?:\\s*"+op+"\\s*"+atom+")+","g");
-s = s.replace(expr, m => "$" + m + "$");
-if(/^([A-Z]_[A-Za-z0-9]+)$/.test(s))s="$"+s+"$";
-}
+function mx(s,inl){s=s==null?"":String(s);
 if(s.indexOf("$")<0)return s;
 const rd=(t,d)=>{try{if(window.katex)return katex.renderToString(t,{throwOnError:false,strict:false,displayMode:d})}catch(e){}return esc(t)};
-const ps=s.split("\n").map(l=>{const m=l.match(/^\s*\$([^$]+)\$\s*$/);return m&&m[1].length>12?{d:1,h:rd(m[1],true)}:{d:0,h:l.replace(/\$([^$]+)\$/g,(_,t)=>rd(t,false))}});
+const ps=s.split("\n").map(l=>{const m=l.match(/^\s*\$([^$]+)\$\s*$/);return m&&m[1].length>12&&!inl?{d:1,h:rd(m[1],true)}:{d:0,h:l.replace(/\$([^$]+)\$/g,(_,t)=>rd(t,false))}});
 let o="";ps.forEach((p,i)=>{if(i&&!p.d&&!ps[i-1].d)o+="\n";o+=p.h});return o}
 const vfu=(l,d)=>l&&l.length?`<div class="viva-fu"><div class="viva-fut">🔗 ${L("এরপর যা জিজ্ঞেস করতে পারে","Possible next questions")}</div>${l.map(y=>`<details class="fu${d}"><summary>↳ ${mx(y.q)}</summary><div class="viva-answer">${mx(y.a)}</div>${vfu(y.f,d+1)}</details>`).join("")}</div>`:"";
 let BK=null;
@@ -139,7 +132,7 @@ function tick(){const e=$("tmr");if(e)e.textContent=bn(String(Math.floor(S.left/
 const OL=()=>LANG==="en"?"ABCD":"কখগঘ";
 function exam(){CUR=exam;const T=S.q.length+S.vv.length,hd=`<div class="card"><div class="top"><span>${L("প্রশ্ন","Question")} ${bn(S.i+1)}/${bn(T)}</span><span class="tm">⏱ <span id="tmr"></span></span></div></div>`;
 let body;
-if(S.i<S.q.length){const x=S.q[S.i];body=`<div class="card"><b>${mx(x[1])}</b>${x[2].map((o,k)=>`<button class="opt ${S.a[S.i]==k?"sel":""}" onclick="ans(${k})">${OL()[k]}. ${mx(o)}</button>`).join("")}</div>`}
+if(S.i<S.q.length){const x=S.q[S.i];body=`<div class="card"><b>${mx(x[1],1)}</b>${x[2].map((o,k)=>`<button class="opt ${S.a[S.i]==k?"sel":""}" onclick="ans(${k})">${OL()[k]}. ${mx(o,1)}</button>`).join("")}</div>`}
 else{const j=S.i-S.q.length,x=S.vv[j];body=`<div class="card"><span class="viva-note">🎤 ${L("ভাইভা প্রশ্ন (মৌখিক) — মনে মনে উত্তর দিন","Viva question (oral) — answer in your mind")}</span><p><b>${mx(x.q)}</b></p>${S.sh[j]?`<div class="viva-answer">${mx(x.a)}</div>${vfu(x.f,1)}<div class="nav"><button class="btn ${S.va[j]==1?"":"g"}" onclick="rate(1)">✅ ${L("পেরেছি","I knew it")}</button><button class="btn ${S.va[j]==0?"":"g"}" onclick="rate(0)">❌ ${L("পারিনি","I didn't")}</button></div>`:`<button class="btn" onclick="reveal()">${L("উত্তর দেখুন","Show answer")}</button>`}</div>`}
 show(hd+body+`<div class="nav"><button class="btn g" onclick="go(-1)" ${S.i?"":"disabled"}>${L("← আগের","← Previous")}</button><button class="btn g" onclick="go(1)" ${S.i<T-1?"":"disabled"}>${L("পরের →","Next →")}</button></div><button class="btn" onclick="if(confirm('${L("পরীক্ষা জমা দিবেন?","Submit the exam?")}'))finish()">${L("জমা দিন","Submit")}</button>`,examSetup,true);tick()}
 function ans(k){S.a[S.i]=S.a[S.i]==k?-1:k;exam()}
@@ -153,7 +146,7 @@ show((S.q.length?`<div class="card"><div class="big">${bn(sc)}</div><div class="
 +S.q.map((x,i)=>book(x,i,S.a[i])).join("")
 +(S.vv.length?`<h3>${L("ভাইভা প্রশ্নের উত্তর","Viva answers")}</h3>`+S.vv.map((x,j)=>`<div class="viva-item card"><details><summary>${bn(j+1)}. ${mx(x.q)} ${S.va[j]==1?"✅":S.va[j]==0?"❌":""}</summary><div class="viva-answer">${mx(x.a)}</div>${vfu(x.f,1)}</details></div>`).join(""):"")
 +`<button class="btn" onclick="examSetup()">${L("নতুন পরীক্ষা","New exam")}</button>`,menu)}
-function book(x,i,u){return`<div class="card"><b>${bn(i+1)}. ${mx(x[1])}</b>${x[2].map((o,k)=>`<div class="opt ${k==x[3]?"ok":k==u?"no":""}">${OL()[k]}. ${mx(o)}${k==x[3]?" ✓":k==u?" ✗":""}</div>`).join("")}${x[4]?`<div class="exp">💡 ${mx(x[4])}</div>`:""}</div>`}
+function book(x,i,u){return`<div class="card"><b>${bn(i+1)}. ${mx(x[1],1)}</b>${x[2].map((o,k)=>`<div class="opt ${k==x[3]?"ok":k==u?"no":""}">${OL()[k]}. ${mx(o,1)}${k==x[3]?" ✓":k==u?" ✗":""}</div>`).join("")}${x[4]?`<div class="exp">💡 ${mx(x[4],1)}</div>`:""}</div>`}
 const API="https://script.google.com/macros/s/AKfycbyccCrYpZvexzHcwLzHgNui7FyLHjMIFINXx3vaBm-IgpiJdyz95a1Qw1hrksdJif5R/exec";
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
 const en=s=>String(s).replace(/[০-৯]/g,d=>"০১২৩৪৫৬৭৮৯".indexOf(d));
