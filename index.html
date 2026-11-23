@@ -55,6 +55,7 @@ main{padding-bottom:96px}
 html,body,*{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 input,textarea{-webkit-user-select:text;user-select:text}
 @media print{body{display:none!important}}
+@media (hover:hover) and (pointer:fine){#app,#app *{-webkit-user-select:text;user-select:text}#app button,#app summary,#app .mn,#app select{-webkit-user-select:none;user-select:none}}
 #sq{display:none;position:fixed;left:12px;right:12px;bottom:84px;z-index:20;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:16px;padding:12px;box-shadow:0 8px 28px rgba(0,0,0,.25);max-width:616px;margin:0 auto}
 #sq .t{font-size:15px;line-height:1.5;max-height:72px;overflow:auto;margin-bottom:8px;font-weight:700}
 #sq .r{display:flex;gap:8px}#sq button{flex:1;padding:11px 6px;border-radius:12px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font:inherit;font-weight:700;-webkit-user-select:none;user-select:none}
@@ -68,7 +69,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
 <div id="nb"><button id="nbB" onclick="goBack()">← পিছনে</button><button id="nbH" onclick="goHome()">🏠 হোম</button></div>
 <script>
 (function(){const ok=t=>t&&t.closest&&t.closest("input,textarea");
-["copy","cut","contextmenu","dragstart","selectstart"].forEach(e=>document.addEventListener(e,ev=>{if(ok(ev.target))return;ev.preventDefault()},true));
+["copy","cut","contextmenu","dragstart","selectstart"].forEach(e=>document.addEventListener(e,ev=>{if(ok(ev.target))return;if(e==="selectstart"&&matchMedia("(pointer:fine)").matches){const n=ev.target.nodeType===3?ev.target.parentElement:ev.target;if(n&&n.closest&&n.closest("#app")&&!n.closest("button,summary,select"))return}ev.preventDefault()},true));
 document.addEventListener("keydown",ev=>{const k=(ev.key||"").toLowerCase();if(ev.key==="F12"||((ev.ctrlKey||ev.metaKey)&&["c","x","a","s","u","p"].includes(k))||(ev.ctrlKey&&ev.shiftKey&&["i","j","c"].includes(k))){if(!ok(ev.target)||k!=="c"&&k!=="x"&&k!=="a")ev.preventDefault()}},true)})();
 let LANG="bn";try{LANG=localStorage.getItem("mv_lang")||"bn"}catch(e){}
 const L=(b,e)=>LANG==="en"?e:b;
@@ -209,8 +210,11 @@ const brk=/[\s,;:()\[\]{}"'“”‘’।?!.]/;if(brk.test(t[i])&&i>0&&!brk.tes
 let a=i,b=i;while(a>0&&!brk.test(t[a-1]))a--;while(b<t.length-1&&!brk.test(t[b+1]))b++;
 let sa=i,sb=i;const sd=/[।?!\n]|\.\s/;while(sa>0&&!sd.test(t[sa-1]))sa--;while(sb<t.length-1&&!sd.test(t[sb]))sb++;
 return{w:t.slice(a,b+1),s:t.slice(sa,sb+1).replace(/\s+/g," ").trim()}}
+function sqSel(){try{const g=window.getSelection();if(!g||g.isCollapsed)return null;const t=g.toString().replace(/\s+/g," ").trim();if(!t||t.length>200)return null;const n=g.anchorNode&&(g.anchorNode.nodeType===3?g.anchorNode.parentElement:g.anchorNode);if(!n||!n.closest||!n.closest("#app")||n.closest("input,textarea"))return null;return{w:t,s:t}}catch(e){return null}}
+function sqShow(o){SQ=o;document.getElementById("sqT").textContent=o.w;document.getElementById("sqW").textContent="🔍 "+L("গুগলে খুঁজুন","Search Google");const ss=document.getElementById("sqS");ss.style.display="none";document.getElementById("sq").style.display="block"}
+document.addEventListener("mouseup",ev=>{if(!matchMedia("(pointer:fine)").matches||(S&&S.running))return;if(ev.target.closest&&ev.target.closest("#sq"))return;setTimeout(()=>{const o=sqSel();if(o)sqShow(o)},10)});
 document.addEventListener("contextmenu",ev=>{try{if(S&&S.running)return;const t=ev.target;if(!t.closest||!t.closest("#app")||t.closest("input,textarea,button,select"))return;
-const o=sqAt(ev.clientX,ev.clientY);if(!o)return;SQ=o;
+let o=sqSel()||sqAt(ev.clientX,ev.clientY);if(!o)return;SQ=o;
 document.getElementById("sqT").textContent=o.w;document.getElementById("sqW").textContent="🔍 "+L("গুগলে খুঁজুন","Search Google");
 const ss=document.getElementById("sqS");ss.textContent=L("পুরো বাক্য","Whole sentence");ss.style.display=o.s&&o.s!==o.w?"":"none";
 document.getElementById("sq").style.display="block"}catch(e){}},true);
