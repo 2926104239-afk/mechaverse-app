@@ -217,7 +217,7 @@ const SQB=/^[\s,;:()\[\]{}"'“”‘’।?!.\-–—]+|[\s,;:()\[\]{}"'“”�
 function sqHide(){const e=document.getElementById("sq");if(e)e.style.display="none";try{CSS.highlights.delete("sq")}catch(x){}}
 function sqText(){if(SQ.tk){const t=SQ.node.data.slice(SQ.tk[SQ.a].s,SQ.tk[SQ.b].e);return t.replace(SQB,"")}return SQ.t}
 function sqPaint(){const T=sqText();document.getElementById("sqT").textContent=T;
-document.getElementById("sqW").textContent="🔍 "+L("ব্রাউজারে খুঁজুন","Search in browser");
+document.getElementById("sqW").textContent="🔍 "+L("গুগলে খুঁজুন","Search Google");
 const st=!!SQ.tk;["sqR1","sqR2"].forEach(i=>document.getElementById(i).style.display=st?"flex":"none");
 document.getElementById("sqS").style.display=st?"":"none";
 if(st){document.getElementById("sqL1").textContent="← "+L("বামে শব্দ যোগ","+ word left");document.getElementById("sqR1b").textContent=L("ডানে শব্দ যোগ","+ word right")+" →";
@@ -227,7 +227,7 @@ try{const r=document.createRange();r.setStart(SQ.node,SQ.tk[SQ.a].s);r.setEnd(SQ
 document.getElementById("sq").style.display="block"}
 function sqStep(side,d){if(!SQ.tk)return;if(side===0){const v=SQ.a-d;if(v>=0&&v<=SQ.b)SQ.a=v}else{const v=SQ.b+d;if(v>=SQ.a&&v<SQ.tk.length)SQ.b=v}sqPaint()}
 function sqGo(m){let t=sqText();if(m===1&&SQ.tk){let a=SQ.a,b=SQ.b;const sd=/[।?!]|\.$/;while(a>0&&!sd.test(SQ.node.data.slice(SQ.tk[a-1].s,SQ.tk[a-1].e)))a--;while(b<SQ.tk.length-1&&!sd.test(SQ.node.data.slice(SQ.tk[b].s,SQ.tk[b].e)))b++;t=SQ.node.data.slice(SQ.tk[a].s,SQ.tk[b].e).replace(SQB,"")}
-t=t.trim();if(!t)return;savePos();sqHide();const u="https://www.google.com/search?q="+encodeURIComponent(t);const en=encodeURIComponent(t);window.open(/Android/i.test(navigator.userAgent)?"intent://www.google.com/search?q="+en+"#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;S.browser_fallback_url="+encodeURIComponent(u)+";end":u,"_blank","noopener")}
+t=t.trim();if(!t)return;savePos();sqHide();const u="https://www.google.com/search?q="+encodeURIComponent(t);window.open(u,"_blank","noopener")}
 function sqAt(x,y){let r=null;if(document.caretRangeFromPoint)r=document.caretRangeFromPoint(x,y);else if(document.caretPositionFromPoint){const p=document.caretPositionFromPoint(x,y);if(p){r=document.createRange();r.setStart(p.offsetNode,p.offset)}}
 if(!r||r.startContainer.nodeType!==3)return null;const n=r.startContainer,t=n.data;const tk=[];t.replace(/\S+/g,(m,i)=>{tk.push({s:i,e:i+m.length})});if(!tk.length)return null;
 const off=Math.min(r.startOffset,t.length-1);let k=tk.findIndex(z=>off>=z.s&&off<z.e);if(k<0)k=tk.findIndex(z=>z.s>=off);if(k<0)k=tk.length-1;
