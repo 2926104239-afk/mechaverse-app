@@ -59,6 +59,9 @@ input,textarea{-webkit-user-select:text;user-select:text}
 #sq .t{font-size:15px;line-height:1.5;max-height:72px;overflow:auto;margin-bottom:8px;font-weight:700}
 #sq .r{display:flex;gap:8px;margin-bottom:8px}#sq .r:last-child{margin-bottom:0}#sq .r button:not(.p){font-size:13px}::highlight(sq){background:#ffd54d;color:#000}#sq button{flex:1;padding:11px 6px;border-radius:12px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font:inherit;font-weight:700;-webkit-user-select:none;user-select:none}
 #sq button.p{background:var(--pr);color:#fff;border-color:var(--pr)}
+.u{line-height:1.85}.u h4{margin:18px 0 6px;color:var(--pr)}.u h5{margin:14px 0 4px}.u p{margin:8px 0}.u ul,.u ol{padding-left:22px;margin:6px 0}.u li{margin:6px 0}.u hr{border:0;border-top:1px solid var(--bd);margin:14px 0}
+.u .u-m{margin:8px 0;overflow-x:auto;overflow-y:hidden;padding:2px 0}.u .katex{font-size:1.04em}.u .katex-display{margin:.5em 0;overflow-x:auto;overflow-y:hidden}
+.u-tw{overflow-x:auto;margin:10px 0;border:1px solid var(--bd);border-radius:10px}.u table{border-collapse:collapse;width:100%;min-width:520px;font-size:14px}.u th,.u td{padding:8px 9px;border-bottom:1px solid var(--bd);text-align:left;vertical-align:middle}.u th{background:rgba(91,75,213,.12)}
 </style>
 </head>
 <body>
@@ -73,7 +76,7 @@ document.addEventListener("keydown",ev=>{const k=(ev.key||"").toLowerCase();if(e
 let LANG="bn";try{LANG=localStorage.getItem("mv_lang")||"bn"}catch(e){}
 const L=(b,e)=>LANG==="en"?e:b;
 const bn=n=>LANG==="en"?String(n):String(n).replace(/\d/g,d=>"০১২৩৪৫৬৭৮৯"[d]).replace("-","−");
-let CH=[],Q=[],VIVA=[],VIVA_CATS=[];
+let CH=[],Q=[],VIVA=[],VIVA_CATS=[],UNITS=[];
 const $=id=>document.getElementById(id),A=$("app");
 let S={},CUR=null,POS=null;
 function dk(){const r=document.documentElement,d=r.dataset.theme==="dark"||(!r.dataset.theme&&matchMedia("(prefers-color-scheme:dark)").matches);r.dataset.theme=d?"light":"dark"}
@@ -98,10 +101,17 @@ function menu(){CUR=menu;POS=["menu"];clearInterval(S.t);S.running=false;
 show(`<div class="hero"><h2 style="margin:0 0 4px">BAKIR's Mechaverse</h2><small>${L("কী করতে চান?","What would you like to do?")}</small></div>
 <button class="mn" onclick="study()"><span class="mi">📖</span><span><b>${L("পড়াশোনা","Study")}</b><small>${L("অধ্যায় ভিত্তিক MCQ, উত্তর ও ব্যাখ্যাসহ","Chapter-wise MCQs with answers and explanations")}</small></span></button>
 <button class="mn" onclick="vivaHome()"><span class="mi">🎤</span><span><b>${L("ভাইভা প্রস্তুতি","Viva Preparation")}</b><small>${L("ভাইভার প্রশ্ন, উত্তর ও পরের সম্ভাব্য প্রশ্ন","Viva questions, answers and follow-up questions")}</small></span></button>
+<button class="mn" onclick="units()" ${UNITS.length?"":"disabled"}><span class="mi">📐</span><span><b>${L("এককের ধারণা","Concept of Units")}</b><small>${L("মৌলিক থেকে যৌগিক রাশি, একক রূপান্তর ও মাত্রা বিশ্লেষণ","From base to derived quantities, unit conversion and dimensional analysis")}</small></span></button>
 <button class="mn" onclick="examSetup()"><span class="mi">📝</span><span><b>${L("পরীক্ষা","Exam")}</b><small>${L("সময় ও নম্বর ঠিক করে মডেল টেস্ট দিন","Set time and marks, then take a model test")}</small></span></button>`,null)}
 function study(){CUR=study;POS=["study"];show(`<div class="hero"><h2 style="margin:0">📖 ${L("পড়াশোনা","Study")}</h2><small>${L("একটি অধ্যায়ে চাপ দিন, উত্তর ও ব্যাখ্যাসহ পড়ুন","Tap a chapter to read with answers and explanations")}</small></div>
 ${CH.map((c,i)=>{const n=Q.filter(q=>q[0]==i).length;return `<button class="mn ch" ${n?`onclick="readCh(${i})"`:"disabled"}><span class="mi">${bn(i+1)}</span><span><b>${c}</b><small>${n?bn(n)+L("টি প্রশ্ন"," questions"):L("শীঘ্রই আসছে","Coming soon")}</small></span></button>`}).join("")}`,menu)}
 function readCh(c){CUR=()=>readCh(c);POS=["readCh",c];show(`<h3 style="margin:6px 0 10px">${CH[c]}</h3>`+Q.filter(x=>x[0]==c).map((x,i)=>book(x,i,-1)).join(""),study)}
+const kx=s=>{const rd=(t,d)=>{try{if(window.katex)return katex.renderToString(t,{throwOnError:false,strict:false,displayMode:d})}catch(e){}return esc(t)};return s.replace(/\$\$([\s\S]+?)\$\$/g,(_,t)=>rd(t,true)).replace(/\$([^$\n]+?)\$/g,(_,t)=>rd(t,false))};
+function units(){CUR=units;POS=["units"];show(`<div class="hero"><h2 style="margin:0">📐 ${L("এককের ধারণা","Concept of Units")}</h2><small>${L("একটি অধ্যায়ে চাপ দিয়ে পড়ুন","Tap a chapter to read")}</small></div>
+${UNITS.map((u,i)=>`<button class="mn ch" onclick="readUnit(${i})"><span class="mi">${bn(u.n)}</span><span><b>${u.title}</b></span></button>`).join("")}`,menu)}
+function readUnit(i){CUR=()=>readUnit(i);POS=["readUnit",i];const u=UNITS[i];if(!u)return units();
+show(`<h3 style="margin:6px 0 4px">${u.tag}: ${u.title}</h3><div class="card u">${kx(u.h)}</div>
+<div class="nav">${i>0?`<button class="btn g" onclick="readUnit(${i-1})">${L("← আগের অধ্যায়","← Previous")}</button>`:""}${i<UNITS.length-1?`<button class="btn" onclick="readUnit(${i+1})">${L("পরের অধ্যায় →","Next →")}</button>`:""}</div>`,units)}
 function vivaHome(){CUR=vivaHome;POS=["vivaHome"];
 clearInterval(S.t);
 show(`<div class="hero"><h2 style="margin:0 0 4px">${L("ভাইভা প্রস্তুতি","Viva Preparation")}</h2><small>${L("প্রশ্নে চাপ দিয়ে উত্তর ও পরের সম্ভাব্য প্রশ্ন দেখুন","Tap a question to see the answer and possible next questions")}</small></div>
@@ -161,7 +171,7 @@ clearExpiryTimer();
 const tok=store.get("mv_tok"),exp=Number(store.get("mv_exp")||0);
 if(!tok||!exp)return true;
 const left=exp-Date.now();
-if(left<=0){store.del("mv_tok");store.del("mv_exp");CH=[];Q=[];VIVA=[];VIVA_CATS=[];loginScreen(L("অ্যাক্সেসের মেয়াদ শেষ হয়েছে। আবার প্রবেশ করতে নতুন OTP নিন।","Access has expired. Request a new OTP to sign in again."));return false}
+if(left<=0){store.del("mv_tok");store.del("mv_exp");CH=[];Q=[];VIVA=[];VIVA_CATS=[];UNITS=[];loginScreen(L("অ্যাক্সেসের মেয়াদ শেষ হয়েছে। আবার প্রবেশ করতে নতুন OTP নিন।","Access has expired. Request a new OTP to sign in again."));return false}
 // Browser timeout-এর সর্বোচ্চ সীমা (~24.8 দিন) মেনে বড় মেয়াদেও পুনরায় পরীক্ষা।
 expiryTimer=setTimeout(enforceExpiry,Math.min(left,2147480000));
 return true
@@ -206,11 +216,11 @@ catch(e){otpScreen(id,NET())}}
 async function loadData(tok){
 busy(L("প্রশ্ন লোড হচ্ছে...","Loading questions..."));
 try{const r=await call({action:"data",token:tok});
-if(r.ok){CH=r.d.CH;Q=r.d.Q;VIVA=r.d.VIVA;VIVA_CATS=r.d.VIVA_CATS;if(r.expiresAt)store.set("mv_exp",String(r.expiresAt));$("lo").style.display="";if(enforceExpiry()&&!restorePos())splash()}
+if(r.ok){CH=r.d.CH;Q=r.d.Q;VIVA=r.d.VIVA;VIVA_CATS=r.d.VIVA_CATS;UNITS=r.d.UNITS||[];if(r.expiresAt)store.set("mv_exp",String(r.expiresAt));$("lo").style.display="";if(enforceExpiry()&&!restorePos())splash()}
 else if(r.err==="session"){store.del("mv_tok");store.del("mv_exp");loginScreen(L("অ্যাক্সেসের মেয়াদ শেষ। আবার প্রবেশ করতে নতুন OTP নিন।","Access expired. Request a new OTP to sign in again."))}
 else{A.innerHTML=`<div class="card"><p>${esc(r.err||L("ডেটা আনা যায়নি","Could not load data"))}</p><button class="btn" onclick="loadData('${tok}')">${L("আবার চেষ্টা করুন","Try again")}</button></div>`}}
 catch(e){A.innerHTML=`<div class="card"><p>${NET()}.</p><button class="btn" onclick="loadData('${tok}')">${L("আবার চেষ্টা করুন","Try again")}</button></div>`}}
-function logout(){if(!confirm(L("বের হতে চান?","Log out?")))return;store.del("mv_pos");clearExpiryTimer();store.del("mv_tok");store.del("mv_exp");CH=[];Q=[];VIVA=[];VIVA_CATS=[];loginScreen()}
+function logout(){if(!confirm(L("বের হতে চান?","Log out?")))return;store.del("mv_pos");clearExpiryTimer();store.del("mv_tok");store.del("mv_exp");CH=[];Q=[];VIVA=[];VIVA_CATS=[];UNITS=[];loginScreen()}
 
 let SQ={t:"",tk:null,a:0,b:0,node:null};
 const SQB=/^[\s,;:()\[\]{}"'“”‘’।?!.\-–—]+|[\s,;:()\[\]{}"'“”‘’।?!.\-–—]+$/g;
@@ -245,7 +255,7 @@ document.addEventListener("click",ev=>{if(Date.now()-(window._sqT||0)<400)return
 window.addEventListener("scroll",()=>{if(!SQ.tk)sqHide()},{passive:true});
 window.addEventListener("focus",enforceExpiry);document.addEventListener("visibilitychange",()=>{if(!document.hidden)enforceExpiry()});
 function savePos(){try{if(POS&&!S.running)store.set("mv_pos",JSON.stringify({p:POS,y:window.scrollY,t:Date.now()}))}catch(e){}}
-function restorePos(){try{const o=JSON.parse(store.get("mv_pos")||"null");store.del("mv_pos");if(!o||!o.p||Date.now()-o.t>1800000)return false;const fn={menu,study,readCh,vivaHome,examSetup}[o.p[0]];if(!fn)return false;fn(o.p[1]);setTimeout(()=>window.scrollTo(0,o.y||0),60);return true}catch(e){return false}}
+function restorePos(){try{const o=JSON.parse(store.get("mv_pos")||"null");store.del("mv_pos");if(!o||!o.p||Date.now()-o.t>1800000)return false;const fn={menu,study,readCh,vivaHome,examSetup,units,readUnit}[o.p[0]];if(!fn)return false;fn(o.p[1]);setTimeout(()=>window.scrollTo(0,o.y||0),60);return true}catch(e){return false}}
 document.addEventListener("visibilitychange",()=>{if(document.hidden)savePos()});window.addEventListener("pagehide",savePos);
 applyLang();(function boot(){const t=store.get("mv_tok");t?loadData(t):loginScreen()})();
 </script>
