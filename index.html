@@ -154,13 +154,25 @@ show((S.q.length?`<div class="card"><div class="big">${bn(sc)}</div><div class="
 function book(x,i,u){return`<div class="card"><b>${bn(i+1)}. ${mx(x[1],1)}</b>${x[2].map((o,k)=>`<div class="opt ${k==x[3]?"ok":k==u?"no":""}">${OL()[k]}. ${mx(o,1)}${k==x[3]?" ✓":k==u?" ✗":""}</div>`).join("")}${x[4]?`<div class="exp">💡 ${mx(x[4],1)}</div>`:""}</div>`}
 const API="https://script.google.com/macros/s/AKfycbyccCrYpZvexzHcwLzHgNui7FyLHjMIFINXx3vaBm-IgpiJdyz95a1Qw1hrksdJif5R/exec";
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+let expiryTimer=null;
+function clearExpiryTimer(){if(expiryTimer!==null){clearTimeout(expiryTimer);expiryTimer=null}}
+function enforceExpiry(){
+clearExpiryTimer();
+const tok=store.get("mv_tok"),exp=Number(store.get("mv_exp")||0);
+if(!tok||!exp)return true;
+const left=exp-Date.now();
+if(left<=0){store.del("mv_tok");store.del("mv_exp");CH=[];Q=[];VIVA=[];VIVA_CATS=[];loginScreen(L("অ্যাক্সেসের মেয়াদ শেষ হয়েছে। আবার প্রবেশ করতে নতুন OTP নিন।","Access has expired. Request a new OTP to sign in again."));return false}
+// Browser timeout-এর সর্বোচ্চ সীমা (~24.8 দিন) মেনে বড় মেয়াদেও পুনরায় পরীক্ষা।
+expiryTimer=setTimeout(enforceExpiry,Math.min(left,2147480000));
+return true
+}
 const en=s=>String(s).replace(/[০-৯]/g,d=>"০১২৩৪৫৬৭৮৯".indexOf(d));
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 async function call(o){const r=await fetch(API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(o)});return r.json()}
 const NET=()=>L("ইন্টারনেট সংযোগ নেই বা সার্ভারে পৌঁছানো যায়নি","No internet connection or the server could not be reached");
 function busy(t){$("nb").style.display="none";A.innerHTML=`<div class="card" style="text-align:center;padding:30px 14px">${esc(t)}</div>`}
 function loginScreen(msg){CUR=()=>loginScreen(msg);
-clearInterval(S.t);S.running=false;$("nb").style.display="none";$("lo").style.display="none";
+clearExpiryTimer();clearInterval(S.t);S.running=false;$("nb").style.display="none";$("lo").style.display="none";
 const rid=store.get("mv_req");
 A.innerHTML=`<div class="hero"><h2 style="margin:0 0 4px">${L("প্রবেশের অনুমতি","Request Access")}</h2><small>${L("পরীক্ষা দিতে নাম ও ফোন নম্বর দিয়ে অনুরোধ পাঠান। অ্যাপের মালিক আপনাকে একটি ওটিপি দেবেন।","Send a request with your name and phone number. The app owner will give you an OTP.")}</small></div>
 <div class="card">${msg?`<p class="viva-note" style="color:var(--no);margin-top:0">${esc(msg)}</p>`:""}
@@ -188,17 +200,17 @@ const o=en($("otp").value).replace(/\D/g,"");
 if(o.length!==6)return alert(L("৬ সংখ্যার ওটিপি দিন","Enter the 6-digit OTP"));
 $("otB").disabled=true;$("otB").textContent=L("যাচাই হচ্ছে...","Verifying...");
 try{const r=await call({action:"verify",id,otp:o});
-if(r.ok){store.set("mv_tok",r.token);store.del("mv_req");loadData(r.token)}
+if(r.ok){store.set("mv_tok",r.token);if(r.expiresAt)store.set("mv_exp",String(r.expiresAt));store.del("mv_req");loadData(r.token)}
 else{otpScreen(id,r.err||L("ওটিপি ভুল","Wrong OTP"))}}
 catch(e){otpScreen(id,NET())}}
 async function loadData(tok){
 busy(L("প্রশ্ন লোড হচ্ছে...","Loading questions..."));
 try{const r=await call({action:"data",token:tok});
-if(r.ok){CH=r.d.CH;Q=r.d.Q;VIVA=r.d.VIVA;VIVA_CATS=r.d.VIVA_CATS;$("lo").style.display="";splash()}
-else if(r.err==="session"){store.del("mv_tok");loginScreen(L("সেশনের মেয়াদ শেষ। আবার অনুরোধ পাঠান।","Session expired. Please send a request again."))}
+if(r.ok){CH=r.d.CH;Q=r.d.Q;VIVA=r.d.VIVA;VIVA_CATS=r.d.VIVA_CATS;if(r.expiresAt)store.set("mv_exp",String(r.expiresAt));$("lo").style.display="";if(enforceExpiry())splash()}
+else if(r.err==="session"){store.del("mv_tok");store.del("mv_exp");loginScreen(L("অ্যাক্সেসের মেয়াদ শেষ। আবার প্রবেশ করতে নতুন OTP নিন।","Access expired. Request a new OTP to sign in again."))}
 else{A.innerHTML=`<div class="card"><p>${esc(r.err||L("ডেটা আনা যায়নি","Could not load data"))}</p><button class="btn" onclick="loadData('${tok}')">${L("আবার চেষ্টা করুন","Try again")}</button></div>`}}
 catch(e){A.innerHTML=`<div class="card"><p>${NET()}.</p><button class="btn" onclick="loadData('${tok}')">${L("আবার চেষ্টা করুন","Try again")}</button></div>`}}
-function logout(){if(!confirm(L("বের হতে চান?","Log out?")))return;store.del("mv_tok");CH=[];Q=[];VIVA=[];VIVA_CATS=[];loginScreen()}
+function logout(){if(!confirm(L("বের হতে চান?","Log out?")))return;clearExpiryTimer();store.del("mv_tok");store.del("mv_exp");CH=[];Q=[];VIVA=[];VIVA_CATS=[];loginScreen()}
 
 let SQ={t:"",tk:null,a:0,b:0,node:null};
 const SQB=/^[\s,;:()\[\]{}"'“”‘’।?!.\-–—]+|[\s,;:()\[\]{}"'“”‘’।?!.\-–—]+$/g;
@@ -215,7 +227,7 @@ try{const r=document.createRange();r.setStart(SQ.node,SQ.tk[SQ.a].s);r.setEnd(SQ
 document.getElementById("sq").style.display="block"}
 function sqStep(side,d){if(!SQ.tk)return;if(side===0){const v=SQ.a-d;if(v>=0&&v<=SQ.b)SQ.a=v}else{const v=SQ.b+d;if(v>=SQ.a&&v<SQ.tk.length)SQ.b=v}sqPaint()}
 function sqGo(m){let t=sqText();if(m&&SQ.tk){let a=SQ.a,b=SQ.b;const sd=/[।?!]|\.$/;while(a>0&&!sd.test(SQ.node.data.slice(SQ.tk[a-1].s,SQ.tk[a-1].e)))a--;while(b<SQ.tk.length-1&&!sd.test(SQ.node.data.slice(SQ.tk[b].s,SQ.tk[b].e)))b++;t=SQ.node.data.slice(SQ.tk[a].s,SQ.tk[b].e).replace(SQB,"")}
-t=t.trim();if(!t)return;window.open("https://www.google.com/search?q="+encodeURIComponent(t),"_blank","noopener");sqHide()}
+t=t.trim();if(!t)return;sqHide();location.href="https://www.google.com/search?q="+encodeURIComponent(t)}
 function sqAt(x,y){let r=null;if(document.caretRangeFromPoint)r=document.caretRangeFromPoint(x,y);else if(document.caretPositionFromPoint){const p=document.caretPositionFromPoint(x,y);if(p){r=document.createRange();r.setStart(p.offsetNode,p.offset)}}
 if(!r||r.startContainer.nodeType!==3)return null;const n=r.startContainer,t=n.data;const tk=[];t.replace(/\S+/g,(m,i)=>{tk.push({s:i,e:i+m.length})});if(!tk.length)return null;
 const off=Math.min(r.startOffset,t.length-1);let k=tk.findIndex(z=>off>=z.s&&off<z.e);if(k<0)k=tk.findIndex(z=>z.s>=off);if(k<0)k=tk.length-1;
@@ -231,6 +243,7 @@ document.addEventListener("contextmenu",ev=>{try{if(S&&S.running)return;const t=
 const o=sqAt(ev.clientX,ev.clientY);if(!o)return;SQ=o;sqPaint()}catch(e){}},true);
 document.addEventListener("click",ev=>{if(Date.now()-(window._sqT||0)<400)return;const e=document.getElementById("sq");if(e&&e.style.display==="block"&&!e.contains(ev.target))sqHide()},true);
 window.addEventListener("scroll",()=>{if(!SQ.tk)sqHide()},{passive:true});
+window.addEventListener("focus",enforceExpiry);document.addEventListener("visibilitychange",()=>{if(!document.hidden)enforceExpiry()});
 applyLang();(function boot(){const t=store.get("mv_tok");t?loadData(t):loginScreen()})();
 </script>
 </body>
