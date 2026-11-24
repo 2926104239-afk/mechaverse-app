@@ -75,7 +75,7 @@ const L=(b,e)=>LANG==="en"?e:b;
 const bn=n=>LANG==="en"?String(n):String(n).replace(/\d/g,d=>"০১২৩৪৫৬৭৮৯"[d]).replace("-","−");
 let CH=[],Q=[],VIVA=[],VIVA_CATS=[];
 const $=id=>document.getElementById(id),A=$("app");
-let S={},CUR=null;
+let S={},CUR=null,POS=null;
 function dk(){const r=document.documentElement,d=r.dataset.theme==="dark"||(!r.dataset.theme&&matchMedia("(prefers-color-scheme:dark)").matches);r.dataset.theme=d?"light":"dark"}
 function applyLang(){document.documentElement.lang=LANG==="en"?"en":"bn";$("lg").textContent=LANG==="en"?"বাংলা":"EN";$("lo").setAttribute("aria-label",L("বের হন","Log out"));$("nbB").textContent=L("← পিছনে","← Back");$("nbH").textContent=L("🏠 হোম","🏠 Home")}
 function toggleLang(){LANG=LANG==="en"?"bn":"en";try{localStorage.setItem("mv_lang",LANG)}catch(e){}applyLang();if(CUR)CUR()}
@@ -94,15 +94,15 @@ function show(html,back,keep){A.innerHTML=html;BK=back||null;$("nb").style.displ
 function goBack(){if(S.running&&!confirm(L("পরীক্ষা ছেড়ে বের হবেন? উত্তর হারিয়ে যাবে।","Leave the exam? Your answers will be lost.")))return;if(S.running){clearInterval(S.t);S.running=false;S.i=0}if(BK)BK();else menu()}
 function goHome(){if(S.running&&!confirm(L("পরীক্ষা ছেড়ে বের হবেন? উত্তর হারিয়ে যাবে।","Leave the exam? Your answers will be lost.")))return;clearInterval(S.t);S.running=false;menu()}
 function splash(){CUR=splash;clearInterval(S.t);show(`<div class="splash"><div class="sp1">Welcome to</div><div class="sp2">BAKIR's Mechaverse</div><small>Mechanical Engineering | Power Engineering</small></div>`,null);setTimeout(()=>{if(document.querySelector(".splash"))menu()},1800)}
-function menu(){CUR=menu;clearInterval(S.t);S.running=false;
+function menu(){CUR=menu;POS=["menu"];clearInterval(S.t);S.running=false;
 show(`<div class="hero"><h2 style="margin:0 0 4px">BAKIR's Mechaverse</h2><small>${L("কী করতে চান?","What would you like to do?")}</small></div>
 <button class="mn" onclick="study()"><span class="mi">📖</span><span><b>${L("পড়াশোনা","Study")}</b><small>${L("অধ্যায় ভিত্তিক MCQ, উত্তর ও ব্যাখ্যাসহ","Chapter-wise MCQs with answers and explanations")}</small></span></button>
 <button class="mn" onclick="vivaHome()"><span class="mi">🎤</span><span><b>${L("ভাইভা প্রস্তুতি","Viva Preparation")}</b><small>${L("ভাইভার প্রশ্ন, উত্তর ও পরের সম্ভাব্য প্রশ্ন","Viva questions, answers and follow-up questions")}</small></span></button>
 <button class="mn" onclick="examSetup()"><span class="mi">📝</span><span><b>${L("পরীক্ষা","Exam")}</b><small>${L("সময় ও নম্বর ঠিক করে মডেল টেস্ট দিন","Set time and marks, then take a model test")}</small></span></button>`,null)}
-function study(){CUR=study;show(`<div class="hero"><h2 style="margin:0">📖 ${L("পড়াশোনা","Study")}</h2><small>${L("একটি অধ্যায়ে চাপ দিন, উত্তর ও ব্যাখ্যাসহ পড়ুন","Tap a chapter to read with answers and explanations")}</small></div>
+function study(){CUR=study;POS=["study"];show(`<div class="hero"><h2 style="margin:0">📖 ${L("পড়াশোনা","Study")}</h2><small>${L("একটি অধ্যায়ে চাপ দিন, উত্তর ও ব্যাখ্যাসহ পড়ুন","Tap a chapter to read with answers and explanations")}</small></div>
 ${CH.map((c,i)=>{const n=Q.filter(q=>q[0]==i).length;return `<button class="mn ch" ${n?`onclick="readCh(${i})"`:"disabled"}><span class="mi">${bn(i+1)}</span><span><b>${c}</b><small>${n?bn(n)+L("টি প্রশ্ন"," questions"):L("শীঘ্রই আসছে","Coming soon")}</small></span></button>`}).join("")}`,menu)}
-function readCh(c){CUR=()=>readCh(c);show(`<h3 style="margin:6px 0 10px">${CH[c]}</h3>`+Q.filter(x=>x[0]==c).map((x,i)=>book(x,i,-1)).join(""),study)}
-function vivaHome(){CUR=vivaHome;
+function readCh(c){CUR=()=>readCh(c);POS=["readCh",c];show(`<h3 style="margin:6px 0 10px">${CH[c]}</h3>`+Q.filter(x=>x[0]==c).map((x,i)=>book(x,i,-1)).join(""),study)}
+function vivaHome(){CUR=vivaHome;POS=["vivaHome"];
 clearInterval(S.t);
 show(`<div class="hero"><h2 style="margin:0 0 4px">${L("ভাইভা প্রস্তুতি","Viva Preparation")}</h2><small>${L("প্রশ্নে চাপ দিয়ে উত্তর ও পরের সম্ভাব্য প্রশ্ন দেখুন","Tap a question to see the answer and possible next questions")}</small></div>
 <div class="card"><p class="viva-note">${L("এগুলো নমুনা উত্তর। ভাইভায় মুখস্থ না বলে নিজের কথায় বলবেন। কোম্পানির কাজের ধরন অনুযায়ী উত্তর সাজাবেন। যা জানেন না, তা সৎভাবে বলবেন।","These are sample answers. Say them in your own words instead of memorising. Adapt them to the company's work, and be honest about what you don't know.")}</p>
@@ -119,7 +119,7 @@ const filtered=VIVA.filter(x=>(c===""||VIVA_CATS.indexOf(x.cat)===+c)&&(!q||(txt
 $("vivaCount").textContent=bn(filtered.length)+L("টি প্রশ্ন পাওয়া গেছে"," questions found");
 $("vivaList").innerHTML=filtered.map(x=>`<div class="viva-item"><details><summary>${bn(x.n)}. ${mx(x.q)}</summary><div class="viva-answer">${mx(x.a)}</div>${vfu(x.f,1)}</details></div>`).join("")||`<p class="viva-note">${L("কোনো প্রশ্ন পাওয়া যায়নি। অন্য শব্দ দিয়ে খুঁজুন।","No questions found. Try other words.")}</p>`;
 }
-function examSetup(){CUR=examSetup;clearInterval(S.t);S.running=false;show(`<div class="hero"><h2 style="margin:0 0 4px">📝 ${L("পরীক্ষা","Exam")}</h2><small>${L("আপনার পছন্দ মতো অধ্যায়, সময় ও নম্বর ঠিক করুন","Choose chapters, time and marks as you like")}</small></div>
+function examSetup(){CUR=examSetup;POS=["examSetup"];clearInterval(S.t);S.running=false;show(`<div class="hero"><h2 style="margin:0 0 4px">📝 ${L("পরীক্ষা","Exam")}</h2><small>${L("আপনার পছন্দ মতো অধ্যায়, সময় ও নম্বর ঠিক করুন","Choose chapters, time and marks as you like")}</small></div>
 <div class="grid"><div class="card"><label class="f">⏰ ${L("সময়","Time")}<select id="tm">${[10,20,30,60,120].map(m=>`<option value="${m}" ${m==30?"selected":""}>${bn(m)} ${L("মিনিট","min")}</option>`).join("")}</select></label></div>
 <div class="card"><label class="f">📚 ${L("MCQ-র সংখ্যা","Number of MCQs")}<select id="qn">${[10,20,50,100,150,200].map(m=>`<option value="${m}">${bn(m)}${L("টি","")}</option>`).join("")}</select></label></div>
 <div class="card"><label class="f">✅ ${L("প্রতি প্রশ্নে মার্ক","Marks per question")}<select id="mk"><option value="1">${bn(1)}</option><option value="2">${bn(2)}</option></select></label></div>
@@ -135,7 +135,7 @@ S={q,vv,a:q.map(()=>-1),va:vv.map(()=>-1),sh:vv.map(()=>false),i:0,mk:+$("mk").v
 S.t=setInterval(()=>{S.left--;tick();if(S.left<=0)finish()},1000);exam()}
 function tick(){const e=$("tmr");if(e)e.textContent=bn(String(Math.floor(S.left/60)).padStart(2,"0"))+":"+bn(String(S.left%60).padStart(2,"0"))}
 const OL=()=>LANG==="en"?"ABCD":"কখগঘ";
-function exam(){CUR=exam;const T=S.q.length+S.vv.length,hd=`<div class="card"><div class="top"><span>${L("প্রশ্ন","Question")} ${bn(S.i+1)}/${bn(T)}</span><span class="tm">⏱ <span id="tmr"></span></span></div></div>`;
+function exam(){CUR=exam;POS=["menu"];const T=S.q.length+S.vv.length,hd=`<div class="card"><div class="top"><span>${L("প্রশ্ন","Question")} ${bn(S.i+1)}/${bn(T)}</span><span class="tm">⏱ <span id="tmr"></span></span></div></div>`;
 let body;
 if(S.i<S.q.length){const x=S.q[S.i];body=`<div class="card"><b>${mx(x[1],1)}</b>${x[2].map((o,k)=>`<button class="opt ${S.a[S.i]==k?"sel":""}" onclick="ans(${k})">${OL()[k]}. ${mx(o,1)}</button>`).join("")}</div>`}
 else{const j=S.i-S.q.length,x=S.vv[j];body=`<div class="card"><span class="viva-note">🎤 ${L("ভাইভা প্রশ্ন (মৌখিক) — মনে মনে উত্তর দিন","Viva question (oral) — answer in your mind")}</span><p><b>${mx(x.q)}</b></p>${S.sh[j]?`<div class="viva-answer">${mx(x.a)}</div>${vfu(x.f,1)}<div class="nav"><button class="btn ${S.va[j]==1?"":"g"}" onclick="rate(1)">✅ ${L("পেরেছি","I knew it")}</button><button class="btn ${S.va[j]==0?"":"g"}" onclick="rate(0)">❌ ${L("পারিনি","I didn't")}</button></div>`:`<button class="btn" onclick="reveal()">${L("উত্তর দেখুন","Show answer")}</button>`}</div>`}
@@ -144,7 +144,7 @@ function ans(k){S.a[S.i]=S.a[S.i]==k?-1:k;exam()}
 function reveal(){S.sh[S.i-S.q.length]=true;exam()}
 function rate(v){S.va[S.i-S.q.length]=v;exam()}
 function go(d){S.i+=d;exam()}
-function finish(){CUR=finish;clearInterval(S.t);S.running=false;let c=0,w=0;S.q.forEach((x,i)=>{if(S.a[i]<0)return;S.a[i]==x[3]?c++:w++});
+function finish(){CUR=finish;POS=["menu"];clearInterval(S.t);S.running=false;let c=0,w=0;S.q.forEach((x,i)=>{if(S.a[i]<0)return;S.a[i]==x[3]?c++:w++});
 const sc=Math.round((c*S.mk-w*S.ng)*100)/100,vy=S.va.filter(v=>v==1).length,vn=S.va.filter(v=>v==0).length;
 show((S.q.length?`<div class="card"><div class="big">${bn(sc)}</div><div class="st"><div>✅ ${L("সঠিক","Correct")}<br><b>${bn(c)}</b></div><div>❌ ${L("ভুল","Wrong")}<br><b>${bn(w)}</b></div><div>⏭ ${L("বাদ","Skipped")}<br><b>${bn(S.q.length-c-w)}</b></div></div></div>`:"")
 +(S.vv.length?`<div class="card"><b>🎤 ${L("ভাইভা স্ব-মূল্যায়ন","Viva self-assessment")}</b><div class="st"><div>✅ ${L("পেরেছি","Knew it")}<br><b>${bn(vy)}</b></div><div>❌ ${L("পারিনি","Didn't")}<br><b>${bn(vn)}</b></div><div>⏭ ${L("দেখিনি","Not rated")}<br><b>${bn(S.vv.length-vy-vn)}</b></div></div></div>`:"")
@@ -206,11 +206,11 @@ catch(e){otpScreen(id,NET())}}
 async function loadData(tok){
 busy(L("প্রশ্ন লোড হচ্ছে...","Loading questions..."));
 try{const r=await call({action:"data",token:tok});
-if(r.ok){CH=r.d.CH;Q=r.d.Q;VIVA=r.d.VIVA;VIVA_CATS=r.d.VIVA_CATS;if(r.expiresAt)store.set("mv_exp",String(r.expiresAt));$("lo").style.display="";if(enforceExpiry())splash()}
+if(r.ok){CH=r.d.CH;Q=r.d.Q;VIVA=r.d.VIVA;VIVA_CATS=r.d.VIVA_CATS;if(r.expiresAt)store.set("mv_exp",String(r.expiresAt));$("lo").style.display="";if(enforceExpiry()&&!restorePos())splash()}
 else if(r.err==="session"){store.del("mv_tok");store.del("mv_exp");loginScreen(L("অ্যাক্সেসের মেয়াদ শেষ। আবার প্রবেশ করতে নতুন OTP নিন।","Access expired. Request a new OTP to sign in again."))}
 else{A.innerHTML=`<div class="card"><p>${esc(r.err||L("ডেটা আনা যায়নি","Could not load data"))}</p><button class="btn" onclick="loadData('${tok}')">${L("আবার চেষ্টা করুন","Try again")}</button></div>`}}
 catch(e){A.innerHTML=`<div class="card"><p>${NET()}.</p><button class="btn" onclick="loadData('${tok}')">${L("আবার চেষ্টা করুন","Try again")}</button></div>`}}
-function logout(){if(!confirm(L("বের হতে চান?","Log out?")))return;clearExpiryTimer();store.del("mv_tok");store.del("mv_exp");CH=[];Q=[];VIVA=[];VIVA_CATS=[];loginScreen()}
+function logout(){if(!confirm(L("বের হতে চান?","Log out?")))return;store.del("mv_pos");clearExpiryTimer();store.del("mv_tok");store.del("mv_exp");CH=[];Q=[];VIVA=[];VIVA_CATS=[];loginScreen()}
 
 let SQ={t:"",tk:null,a:0,b:0,node:null};
 const SQB=/^[\s,;:()\[\]{}"'“”‘’।?!.\-–—]+|[\s,;:()\[\]{}"'“”‘’।?!.\-–—]+$/g;
@@ -227,7 +227,7 @@ try{const r=document.createRange();r.setStart(SQ.node,SQ.tk[SQ.a].s);r.setEnd(SQ
 document.getElementById("sq").style.display="block"}
 function sqStep(side,d){if(!SQ.tk)return;if(side===0){const v=SQ.a-d;if(v>=0&&v<=SQ.b)SQ.a=v}else{const v=SQ.b+d;if(v>=SQ.a&&v<SQ.tk.length)SQ.b=v}sqPaint()}
 function sqGo(m){let t=sqText();if(m===1&&SQ.tk){let a=SQ.a,b=SQ.b;const sd=/[।?!]|\.$/;while(a>0&&!sd.test(SQ.node.data.slice(SQ.tk[a-1].s,SQ.tk[a-1].e)))a--;while(b<SQ.tk.length-1&&!sd.test(SQ.node.data.slice(SQ.tk[b].s,SQ.tk[b].e)))b++;t=SQ.node.data.slice(SQ.tk[a].s,SQ.tk[b].e).replace(SQB,"")}
-t=t.trim();if(!t)return;sqHide();const u="https://www.google.com/search?q="+encodeURIComponent(t);window.open(m===2?"intent://www.google.com/search?q="+encodeURIComponent(t)+"#Intent;scheme=https;package=com.brave.browser;S.browser_fallback_url="+encodeURIComponent(u)+";end":u,"_blank","noopener")}
+t=t.trim();if(!t)return;savePos();sqHide();const u="https://www.google.com/search?q="+encodeURIComponent(t);window.open(m===2?"intent://www.google.com/search?q="+encodeURIComponent(t)+"#Intent;scheme=https;package=com.brave.browser;S.browser_fallback_url="+encodeURIComponent(u)+";end":u,"_blank","noopener")}
 function sqAt(x,y){let r=null;if(document.caretRangeFromPoint)r=document.caretRangeFromPoint(x,y);else if(document.caretPositionFromPoint){const p=document.caretPositionFromPoint(x,y);if(p){r=document.createRange();r.setStart(p.offsetNode,p.offset)}}
 if(!r||r.startContainer.nodeType!==3)return null;const n=r.startContainer,t=n.data;const tk=[];t.replace(/\S+/g,(m,i)=>{tk.push({s:i,e:i+m.length})});if(!tk.length)return null;
 const off=Math.min(r.startOffset,t.length-1);let k=tk.findIndex(z=>off>=z.s&&off<z.e);if(k<0)k=tk.findIndex(z=>z.s>=off);if(k<0)k=tk.length-1;
@@ -244,6 +244,9 @@ const o=sqAt(ev.clientX,ev.clientY);if(!o)return;SQ=o;sqPaint()}catch(e){}},true
 document.addEventListener("click",ev=>{if(Date.now()-(window._sqT||0)<400)return;const e=document.getElementById("sq");if(e&&e.style.display==="block"&&!e.contains(ev.target))sqHide()},true);
 window.addEventListener("scroll",()=>{if(!SQ.tk)sqHide()},{passive:true});
 window.addEventListener("focus",enforceExpiry);document.addEventListener("visibilitychange",()=>{if(!document.hidden)enforceExpiry()});
+function savePos(){try{if(POS&&!S.running)store.set("mv_pos",JSON.stringify({p:POS,y:window.scrollY,t:Date.now()}))}catch(e){}}
+function restorePos(){try{const o=JSON.parse(store.get("mv_pos")||"null");store.del("mv_pos");if(!o||!o.p||Date.now()-o.t>1800000)return false;const fn={menu,study,readCh,vivaHome,examSetup}[o.p[0]];if(!fn)return false;fn(o.p[1]);setTimeout(()=>window.scrollTo(0,o.y||0),60);return true}catch(e){return false}}
+document.addEventListener("visibilitychange",()=>{if(document.hidden)savePos()});window.addEventListener("pagehide",savePos);
 applyLang();(function boot(){const t=store.get("mv_tok");t?loadData(t):loginScreen()})();
 </script>
 </body>
