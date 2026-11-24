@@ -227,7 +227,7 @@ try{const r=document.createRange();r.setStart(SQ.node,SQ.tk[SQ.a].s);r.setEnd(SQ
 document.getElementById("sq").style.display="block"}
 function sqStep(side,d){if(!SQ.tk)return;if(side===0){const v=SQ.a-d;if(v>=0&&v<=SQ.b)SQ.a=v}else{const v=SQ.b+d;if(v>=SQ.a&&v<SQ.tk.length)SQ.b=v}sqPaint()}
 function sqGo(m){let t=sqText();if(m===1&&SQ.tk){let a=SQ.a,b=SQ.b;const sd=/[।?!]|\.$/;while(a>0&&!sd.test(SQ.node.data.slice(SQ.tk[a-1].s,SQ.tk[a-1].e)))a--;while(b<SQ.tk.length-1&&!sd.test(SQ.node.data.slice(SQ.tk[b].s,SQ.tk[b].e)))b++;t=SQ.node.data.slice(SQ.tk[a].s,SQ.tk[b].e).replace(SQB,"")}
-t=t.trim();if(!t)return;sqHide();const u="https://www.google.com/search?q="+encodeURIComponent(t);if(m===2)location.href="intent://www.google.com/search?q="+encodeURIComponent(t)+"#Intent;scheme=https;package=com.brave.browser;S.browser_fallback_url="+encodeURIComponent(u)+";end";else location.href=u}
+t=t.trim();if(!t)return;sqHide();const u="https://www.google.com/search?q="+encodeURIComponent(t);window.open(m===2?"intent://www.google.com/search?q="+encodeURIComponent(t)+"#Intent;scheme=https;package=com.brave.browser;S.browser_fallback_url="+encodeURIComponent(u)+";end":u,"_blank","noopener")}
 function sqAt(x,y){let r=null;if(document.caretRangeFromPoint)r=document.caretRangeFromPoint(x,y);else if(document.caretPositionFromPoint){const p=document.caretPositionFromPoint(x,y);if(p){r=document.createRange();r.setStart(p.offsetNode,p.offset)}}
 if(!r||r.startContainer.nodeType!==3)return null;const n=r.startContainer,t=n.data;const tk=[];t.replace(/\S+/g,(m,i)=>{tk.push({s:i,e:i+m.length})});if(!tk.length)return null;
 const off=Math.min(r.startOffset,t.length-1);let k=tk.findIndex(z=>off>=z.s&&off<z.e);if(k<0)k=tk.findIndex(z=>z.s>=off);if(k<0)k=tk.length-1;
