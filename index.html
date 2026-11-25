@@ -67,12 +67,23 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .bqh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:12px;color:var(--mu)}
 .bqn{font-weight:700;color:var(--pr);background:rgba(91,75,213,.12);padding:2px 9px;border-radius:99px}
 .bq .opt .katex-display{margin:.3em 0}
+#dr{display:none;position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.45)}
+#dr .p{position:absolute;left:0;top:0;bottom:0;width:78%;max-width:330px;background:var(--card);color:var(--tx);overflow-y:auto;box-shadow:4px 0 24px rgba(0,0,0,.3);padding-bottom:20px}
+#dr .h{background:var(--hd);color:#fff;padding:26px 18px 18px;padding-top:calc(26px + env(safe-area-inset-top,0px))}
+#dr .h b{display:block;font-size:20px}#dr .h small{opacity:.8}
+#dr .i{display:flex;align-items:center;gap:16px;width:100%;padding:15px 20px;border:0;background:none;color:var(--tx);font:inherit;text-align:left;border-bottom:1px solid var(--bd)}
+#dr .i span:first-child{font-size:20px;min-width:26px;text-align:center}
+.lk{display:flex;align-items:center;gap:14px;padding:13px 12px;margin:8px 0;border:1px solid var(--bd);border-radius:14px;color:var(--tx);text-decoration:none;background:var(--card)}
+.lk .mi{font-size:22px;min-width:30px;text-align:center}.lk small{display:block;color:var(--mu);word-break:break-all}
+.pv h4{margin:16px 0 4px;color:var(--pr)}.pv p,.pv li{line-height:1.8;font-size:15px}.pv ul{padding-left:20px;margin:4px 0}
+textarea.viva-search{min-height:130px;resize:vertical}
 </style>
 </head>
 <body>
-<header><span>BAKIR's Mechaverse</span><div><button id="lo" onclick="logout()" aria-label="বের হন" style="display:none">⎋</button><button id="lg" onclick="toggleLang()" aria-label="Language" style="font-size:14px;border:1px solid #fff8;border-radius:8px;padding:3px 8px;margin-right:6px">EN</button><button onclick="dk()" aria-label="Theme">◐</button></div></header>
+<header><div style="display:flex;align-items:center;gap:12px"><button id="mb" onclick="drawer(1)" aria-label="Menu" style="display:none">☰</button><span>BAKIR's Mechaverse</span></div><div><button id="lo" onclick="logout()" aria-label="বের হন" style="display:none">⎋</button><button id="lg" onclick="toggleLang()" aria-label="Language" style="font-size:14px;border:1px solid #fff8;border-radius:8px;padding:3px 8px;margin-right:6px">EN</button><button onclick="dk()" aria-label="Theme">◐</button></div></header>
 <main id="app"></main>
 <div id="sq"><div class="t" id="sqT"></div><div class="r" id="sqR1"><button onclick="sqStep(0,1)" id="sqL1"></button><button onclick="sqStep(1,1)" id="sqR1b"></button></div><div class="r" id="sqR2"><button onclick="sqStep(0,-1)" id="sqL2"></button><button onclick="sqStep(1,-1)" id="sqR2b"></button></div><div class="r"><button class="p" id="sqW" onclick="sqGo(0)"></button><button id="sqS" onclick="sqGo(1)"></button><button onclick="sqHide()">✕</button></div></div>
+<div id="dr" onclick="if(event.target===this)drawer(0)"><div class="p" id="drP"></div></div>
 <div id="nb"><button id="nbB" onclick="goBack()">← পিছনে</button><button id="nbH" onclick="goHome()">🏠 হোম</button></div>
 <script>
 (function(){const ok=t=>t&&t.closest&&t.closest("input,textarea");
@@ -109,6 +120,44 @@ show(`<div class="hero"><h2 style="margin:0 0 4px">BAKIR's Mechaverse</h2><small
 <button class="mn" onclick="units()" ${UNITS.length?"":"disabled"}><span class="mi">📐</span><span><b>${L("এককের ধারণা","Concept of Units")}</b><small>${L("মৌলিক থেকে যৌগিক রাশি, একক রূপান্তর ও মাত্রা বিশ্লেষণ","From base to derived quantities, unit conversion and dimensional analysis")}</small></span></button>
 <button class="mn" onclick="bcsHome()" ${BCS.length?"":"disabled"}><span class="mi">🏛️</span><span><b>BCS Question Bank</b><small>${L("১০ম–৫০তম বিসিএস প্রিলিমিনারি প্রশ্ন, উত্তর ও ব্যাখ্যাসহ","10th–50th BCS preliminary questions with answers and explanations")}</small></span></button>
 <button class="mn" onclick="examSetup()"><span class="mi">📝</span><span><b>${L("পরীক্ষা","Exam")}</b><small>${L("সময় ও নম্বর ঠিক করে মডেল টেস্ট দিন","Set time and marks, then take a model test")}</small></span></button>`,null)}
+const SITE="https://2926104239-afk.github.io/mechaverse-app/";
+const CT={wa:"8801868219227",mail:"sheikhmuhammadbakir@gmail.com",fb:"https://www.facebook.com/sheikhmuhammadbakir.1",ig:"https://www.instagram.com/sheikhmuhammadbakir?cnvx=MXdlaWJhc2o4ZG9reQ=="};
+function drawer(o){const d=$("dr");if(!o){d.style.display="none";return}
+const it=(ic,t,f)=>`<button class="i" onclick="drawer(0);${f}"><span>${ic}</span><span>${t}</span></button>`;
+$("drP").innerHTML=`<div class="h"><b>BAKIR's Mechaverse</b><small>Mechanical Engineering | Power Engineering</small></div>
+${it("🏠",L("হোম","Home"),"goHome()")}${it("🔄",L("রিফ্রেশ","Refresh"),"doRefresh()")}${it("📤",L("অ্যাপ শেয়ার করুন","Share the app"),"doShare()")}${it("⚠️",L("সমস্যা জানান","Report a Problem"),"reportPage()")}${it("📞",L("যোগাযোগ","Contact"),"contactPage()")}${it("ℹ️",L("অ্যাপ সম্পর্কে","About"),"aboutPage()")}${it("🔒",L("গোপনীয়তা নীতি","Privacy Policy"),"privacyPage()")}${it("⎋",L("লগআউট","Log out"),"logout()")}`;
+d.style.display="block"}
+function doRefresh(){if(S.running&&!confirm(L("পরীক্ষা চলছে। রিফ্রেশ করলে উত্তর হারিয়ে যাবে। চালিয়ে যাবেন?","An exam is running. Refreshing will lose your answers. Continue?")))return;savePos();location.reload()}
+async function doShare(){const t=L("BAKIR's Mechaverse — মেকানিক্যাল ও পাওয়ার ইঞ্জিনিয়ারিং MCQ, ভাইভা ও BCS প্রশ্নব্যাংক। ব্যবহার করতে অ্যাপ খুলে প্রবেশের অনুরোধ পাঠান।","BAKIR's Mechaverse — Mechanical & Power Engineering MCQs, viva and BCS question bank. Open it and request access to start.");
+try{if(navigator.share){await navigator.share({title:"BAKIR's Mechaverse",text:t,url:SITE});return}}catch(e){if(e&&e.name==="AbortError")return}
+window.open("https://wa.me/?text="+encodeURIComponent(t+" "+SITE),"_blank","noopener")}
+function lk(ic,t,sub,h){return`<a class="lk" href="${h}" target="_blank" rel="noopener"><span class="mi">${ic}</span><span><b>${t}</b><small>${sub}</small></span></a>`}
+function contactPage(){CUR=contactPage;POS=["menu"];show(`<div class="hero"><h2 style="margin:0 0 4px">📞 ${L("যোগাযোগ","Contact")}</h2><small>${L("প্রশ্ন, পরামর্শ বা সমস্যায় যোগাযোগ করুন","Reach out for questions, suggestions or problems")}</small></div>
+<div class="card">${lk("💬","WhatsApp","01868219227","https://wa.me/"+CT.wa)}${lk("✈️","Telegram","01868219227","https://t.me/+"+CT.wa)}${lk("✉️",L("ইমেইল","Email"),CT.mail,"mailto:"+CT.mail)}${lk("📘","Facebook","sheikhmuhammadbakir.1",CT.fb)}${lk("📸","Instagram","sheikhmuhammadbakir",CT.ig)}</div>
+<div class="card"><button class="btn" style="margin-top:0" onclick="reportPage()">⚠️ ${L("অ্যাপের সমস্যা জানান","Report an app problem")}</button></div>`,menu)}
+function aboutPage(){CUR=aboutPage;POS=["menu"];show(`<div class="hero"><h2 style="margin:0 0 4px">ℹ️ ${L("অ্যাপ সম্পর্কে","About")}</h2><small>BAKIR's Mechaverse</small></div>
+<div class="card pv"><p>${L("BAKIR's Mechaverse মেকানিক্যাল ও পাওয়ার ইঞ্জিনিয়ারিং-এর শিক্ষার্থী ও চাকরিপ্রার্থীদের জন্য একটি অনুশীলনের অ্যাপ।","BAKIR's Mechaverse is a practice app for Mechanical and Power Engineering students and job seekers.")}</p>
+<h4>${L("এতে যা আছে","What's inside")}</h4><ul><li>${L("অধ্যায় ভিত্তিক MCQ, উত্তর ও ব্যাখ্যাসহ","Chapter-wise MCQs with answers and explanations")}</li><li>${L("ভাইভা প্রস্তুতি ও পরের সম্ভাব্য প্রশ্ন","Viva preparation with likely follow-up questions")}</li><li>${L("এককের ধারণা","Concept of Units")}</li><li>${L("BCS প্রশ্নব্যাংক","BCS question bank")}</li><li>${L("সময় ও নম্বর ঠিক করে মডেল টেস্ট","Timed model tests with custom marking")}</li></ul>
+<h4>${L("নির্মাতা","Created by")}</h4><p>Sheikh Muhammad Bakir</p>
+<p class="viva-note">${L("অ্যাপের ব্যবহার আমন্ত্রণ-ভিত্তিক। প্রবেশের জন্য মালিকের দেওয়া ওটিপি লাগে।","Access is invite-based and needs an OTP from the owner.")}</p></div>`,menu)}
+function privacyPage(){CUR=privacyPage;POS=["menu"];show(`<div class="hero"><h2 style="margin:0 0 4px">🔒 ${L("গোপনীয়তা নীতি","Privacy Policy")}</h2><small>BAKIR's Mechaverse</small></div>
+<div class="card pv">
+<h4>${L("কী তথ্য নেওয়া হয়","Information we collect")}</h4><ul><li>${L("প্রবেশের অনুরোধের সময় আপনার নাম ও ফোন নম্বর।","Your name and phone number when you request access.")}</li><li>${L("সমস্যা জানালে আপনার লেখা বার্তা।","The message you write if you report a problem.")}</li></ul>
+<h4>${L("কেন নেওয়া হয়","Why")}</h4><ul><li>${L("কে অ্যাপ ব্যবহার করছে তা চেনা এবং ওটিপি দিয়ে প্রবেশের অনুমতি দেওয়া।","To know who uses the app and to grant access with an OTP.")}</li><li>${L("আপনার প্ল্যানের মেয়াদ ঠিক রাখা।","To manage the duration of your plan.")}</li><li>${L("আপনার জানানো সমস্যার সমাধান করা।","To fix problems you report.")}</li></ul>
+<h4>${L("তথ্য কোথায় থাকে","Where it is stored")}</h4><p>${L("তথ্য অ্যাপের মালিকের Google Sheet-এ থাকে। ওটিপি ও প্রবেশের খবর মালিকের টেলিগ্রামে যায়। আপনার ফোনে শুধু প্রবেশের টোকেন, ভাষার পছন্দ ও শেষ দেখা পেজ রাখা হয়।","It is kept in the owner's Google Sheet. OTPs and access notices go to the owner's Telegram. Only an access token, your language choice and your last viewed page are stored on your phone.")}</p>
+<h4>${L("শেয়ার ও বিজ্ঞাপন","Sharing and ads")}</h4><p>${L("আপনার তথ্য বিক্রি বা তৃতীয় পক্ষকে দেওয়া হয় না। অ্যাপে কোনো বিজ্ঞাপন নেই।","Your information is not sold or given to third parties. The app has no ads.")}</p>
+<h4>${L("গুগল সার্চ","Google search")}</h4><p>${L("শব্দ সিলেক্ট করে সার্চ করলে সেই শব্দটি গুগলে যায়। এরপর গুগলের নিজস্ব নীতি প্রযোজ্য।","When you search a selected word, it is sent to Google, whose own policy then applies.")}</p>
+<h4>${L("তথ্য মুছতে","Deleting your data")}</h4><p>${L("আপনার তথ্য মুছতে বা প্রশ্নের জন্য যোগাযোগ করুন: ","To delete your data or ask a question, contact: ")}${CT.mail}</p></div>`,menu)}
+function reportPage(msg){CUR=()=>reportPage(msg);POS=["menu"];show(`<div class="hero"><h2 style="margin:0 0 4px">⚠️ ${L("সমস্যা জানান","Report a Problem")}</h2><small>${L("সমস্যাটি লিখুন। আপনার নাম ও ফোন নম্বরসহ তা সরাসরি মালিকের কাছে যাবে।","Describe the problem. It goes straight to the owner with your name and phone number.")}</small></div>
+<div class="card">${msg?`<p class="viva-note" style="color:var(--no);margin-top:0">${esc(msg)}</p>`:""}<textarea id="rpT" class="viva-search" maxlength="600" placeholder="${L("কী সমস্যা হচ্ছে? কোন পেজে? লিখুন...","What went wrong? On which page?")}"></textarea>
+<button class="btn" id="rpB" onclick="sendReport()">${L("পাঠান","Send")}</button></div>`,menu)}
+async function sendReport(){const m=$("rpT").value.trim();if(m.length<5)return alert(L("সমস্যাটি একটু বিস্তারিত লিখুন","Please describe the problem a bit more"));
+$("rpB").disabled=true;$("rpB").textContent=L("পাঠানো হচ্ছে...","Sending...");
+try{const r=await call({action:"report",token:store.get("mv_tok")||"",msg:m,ctx:(POS&&POS[0])||""});
+if(r.ok){show(`<div class="card" style="text-align:center;padding:28px 14px"><div style="font-size:42px">✅</div><p><b>${L("ধন্যবাদ! রিপোর্ট পাঠানো হয়েছে।","Thank you! Your report was sent.")}</b></p><button class="btn" onclick="menu()">${L("হোমে যান","Go home")}</button></div>`,null)}
+else if(r.err==="session"){store.del("mv_tok");store.del("mv_exp");loginScreen(L("অ্যাক্সেসের মেয়াদ শেষ। আবার প্রবেশ করতে নতুন OTP নিন।","Access expired. Request a new OTP to sign in again."))}
+else reportPage(r.err||L("পাঠানো যায়নি","Could not send"))}
+catch(e){reportPage(NET())}}
 function study(){CUR=study;POS=["study"];show(`<div class="hero"><h2 style="margin:0">📖 ${L("পড়াশোনা","Study")}</h2><small>${L("একটি অধ্যায়ে চাপ দিন, উত্তর ও ব্যাখ্যাসহ পড়ুন","Tap a chapter to read with answers and explanations")}</small></div>
 ${CH.map((c,i)=>{const n=Q.filter(q=>q[0]==i).length;return `<button class="mn ch" ${n?`onclick="readCh(${i})"`:"disabled"}><span class="mi">${bn(i+1)}</span><span><b>${c}</b><small>${n?bn(n)+L("টি প্রশ্ন"," questions"):L("শীঘ্রই আসছে","Coming soon")}</small></span></button>`}).join("")}`,menu)}
 let SS={c:-1,mode:"p",ans:{}};
@@ -217,7 +266,7 @@ async function call(o){const r=await fetch(API,{method:"POST",headers:{"Content-
 const NET=()=>L("ইন্টারনেট সংযোগ নেই বা সার্ভারে পৌঁছানো যায়নি","No internet connection or the server could not be reached");
 function busy(t){$("nb").style.display="none";A.innerHTML=`<div class="card" style="text-align:center;padding:30px 14px">${esc(t)}</div>`}
 function loginScreen(msg){CUR=()=>loginScreen(msg);
-clearExpiryTimer();clearInterval(S.t);S.running=false;$("nb").style.display="none";$("lo").style.display="none";
+clearExpiryTimer();clearInterval(S.t);S.running=false;$("nb").style.display="none";$("lo").style.display="none";$("mb").style.display="none";drawer(0);
 const rid=store.get("mv_req");
 A.innerHTML=`<div class="hero"><h2 style="margin:0 0 4px">${L("প্রবেশের অনুমতি","Request Access")}</h2><small>${L("পরীক্ষা দিতে নাম ও ফোন নম্বর দিয়ে অনুরোধ পাঠান। অ্যাপের মালিক আপনাকে একটি ওটিপি দেবেন।","Send a request with your name and phone number. The app owner will give you an OTP.")}</small></div>
 <div class="card">${msg?`<p class="viva-note" style="color:var(--no);margin-top:0">${esc(msg)}</p>`:""}
@@ -251,7 +300,7 @@ catch(e){otpScreen(id,NET())}}
 async function loadData(tok){
 busy(L("প্রশ্ন লোড হচ্ছে...","Loading questions..."));
 try{const r=await call({action:"data",token:tok});
-if(r.ok){CH=r.d.CH;Q=r.d.Q;VIVA=r.d.VIVA;VIVA_CATS=r.d.VIVA_CATS;UNITS=r.d.UNITS||[];BCS=r.d.BCS||[];BCS_SECS=r.d.BCS_SECS||[];if(r.expiresAt)store.set("mv_exp",String(r.expiresAt));$("lo").style.display="";if(enforceExpiry()&&!restorePos())splash()}
+if(r.ok){CH=r.d.CH;Q=r.d.Q;VIVA=r.d.VIVA;VIVA_CATS=r.d.VIVA_CATS;UNITS=r.d.UNITS||[];BCS=r.d.BCS||[];BCS_SECS=r.d.BCS_SECS||[];if(r.expiresAt)store.set("mv_exp",String(r.expiresAt));$("lo").style.display="";$("mb").style.display="";if(enforceExpiry()&&!restorePos())splash()}
 else if(r.err==="session"){store.del("mv_tok");store.del("mv_exp");loginScreen(L("অ্যাক্সেসের মেয়াদ শেষ। আবার প্রবেশ করতে নতুন OTP নিন।","Access expired. Request a new OTP to sign in again."))}
 else{A.innerHTML=`<div class="card"><p>${esc(r.err||L("ডেটা আনা যায়নি","Could not load data"))}</p><button class="btn" onclick="loadData('${tok}')">${L("আবার চেষ্টা করুন","Try again")}</button></div>`}}
 catch(e){A.innerHTML=`<div class="card"><p>${NET()}.</p><button class="btn" onclick="loadData('${tok}')">${L("আবার চেষ্টা করুন","Try again")}</button></div>`}}
