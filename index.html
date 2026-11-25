@@ -145,10 +145,10 @@ const BCS_EN=["Bangla Language & Literature","English Language & Literature","Ba
 const bsec=i=>LANG==="en"?(BCS_EN[i]||BCS_SECS[i]):BCS_SECS[i];
 const BTITLE=n=>L(bn(n)+"তম বিসিএস",n+"th BCS");
 function bIdxFromBCS(){const m={};BCS.forEach(x=>{m[x[5]]=(m[x[5]]||0)+1;BCSL[x[5]]=1});BCS_IDX=Object.keys(m).map(Number).sort((a,b)=>a-b).map(n=>[n,m[n]])}
-async function loadBcs(ns){const tok=store.get("mv_tok");
+async function loadBcs(ns,cb){const tok=store.get("mv_tok"),tot=ns.filter(n=>!BCSL[n]).length;let dn=0;
 for(const n of ns){if(BCSL[n])continue;let r;
 try{r=await call({action:"bcs",token:tok,n:n})}catch(e){return NET()}
-if(r.ok&&Array.isArray(r.d)){r.d.forEach(x=>BCS.push(x));BCSL[n]=1}
+if(r.ok&&Array.isArray(r.d)){r.d.forEach(x=>BCS.push(x));BCSL[n]=1;dn++;if(cb)cb(dn,tot)}
 else if(r.err==="session"){store.del("mv_tok");store.del("mv_exp");CH=[];Q=[];VIVA=[];VIVA_CATS=[];UNITS=[];BCS=[];BCS_IDX=[];BCSL={};loginScreen(L("অ্যাক্সেসের মেয়াদ শেষ। আবার প্রবেশ করতে নতুন OTP নিন।","Access expired. Request a new OTP to sign in again."));return "session"}
 else return r.err||L("ডেটা আনা যায়নি","Could not load data")}
 return ""}
@@ -156,13 +156,13 @@ async function bcsPick(v){BS.n=v;BS.page=0;
 if(v===""){bcsRender();return}
 const need=v==="all"?BCS_IDX.map(z=>z[0]):[+v];
 if(need.some(n=>!BCSL[n])){$("bqList").innerHTML=`<div class="card" style="text-align:center">${L("লোড হচ্ছে...","Loading...")}</div>`;$("bqNav").innerHTML="";
-const e=await loadBcs(need);if(e==="session")return;
+const e=await loadBcs(need,(d,t)=>{if(BS.n===v&&$("bqList"))$("bqList").innerHTML=`<div class="card" style="text-align:center">${L("লোড হচ্ছে...","Loading...")} ${bn(d)}/${bn(t)}</div>`});if(e==="session")return;
 if(e){$("bqList").innerHTML=`<div class="card"><p>${esc(e)}</p><button class="btn" onclick="bcsPick(BS.n)">${L("আবার চেষ্টা করুন","Try again")}</button></div>`;return}}
 if(BS.n===v)bcsRender()}
 function bnAll(){const c=[...document.querySelectorAll(".bnk")],on=c.some(e=>!e.checked);c.forEach(e=>e.checked=on)}
 function bcsHome(){CUR=bcsHome;POS=["bcsHome"];clearInterval(S.t);S.running=false;
 show(`<div class="hero"><h2 style="margin:0 0 4px">🏛️ BCS Question Bank</h2><small>${L("১০ম–৫০তম বিসিএস প্রিলিমিনারি প্রশ্ন। কোনো অপশনে চাপ দিলে সঠিক উত্তর ও ব্যাখ্যা দেখা যাবে","10th–50th BCS preliminary questions. Tap an option to see the correct answer and explanation")}</small></div>
-<div class="card"><select id="bqN" class="viva-cat" onchange="bcsPick(this.value)"><option value="">${L("— বিসিএস বেছে নিন —","— Choose a BCS —")}</option><option value="all" ${BS.n==="all"?"selected":""}>${L("সব বিসিএস (ধীর হতে পারে)","All BCS (may be slow)")}</option>${BCS_IDX.map(z=>`<option value="${z[0]}" ${BS.n==z[0]?"selected":""}>${BTITLE(z[0])} · ${bn(z[1])}${L("টি","")}</option>`).join("")}</select>
+<div class="card"><select id="bqN" class="viva-cat" onchange="bcsPick(this.value)"><option value="">${L("— বিসিএস বেছে নিন —","— Choose a BCS —")}</option><option value="all" ${BS.n==="all"?"selected":""}>${L("সব বিসিএস (৪১টি ফাইল, ধীর)","All BCS (41 files, slow)")}</option>${BCS_IDX.map(z=>`<option value="${z[0]}" ${BS.n==z[0]?"selected":""}>${BTITLE(z[0])} · ${bn(z[1])}${L("টি","")}</option>`).join("")}</select>
 <input id="bqS" class="viva-search" type="search" value="${esc(BS.q)}" placeholder="${L("প্রশ্ন খুঁজুন...","Search questions...")}" oninput="BS.q=this.value;BS.page=0;bcsRender()">
 <select id="bqC" class="viva-cat" onchange="BS.sec=+this.value;BS.page=0;bcsRender()"><option value="-1">${L("সব বিভাগ","All sections")}</option>${BCS_SECS.map((c,i)=>`<option value="${i}" ${BS.sec==i?"selected":""}>${bsec(i)}</option>`).join("")}</select>
 <label class="row" style="border:0"><input type="checkbox" id="bqM" ${BS.mode=="a"?"checked":""} onchange="BS.mode=this.checked?'a':'p';bcsRender(1)"><span>${L("সব উত্তর ও ব্যাখ্যা একসাথে দেখান","Show all answers and explanations")}</span></label>
@@ -196,7 +196,7 @@ async function start(){const p=picked(),useV=$("vz").checked,bk=[...document.que
 if(bz&&!bnums.length&&!p.length&&!useV)return alert(L("অন্তত একটি বিসিএস নির্বাচন করুন","Select at least one BCS"));
 if(!p.length&&!useV&&!useB)return alert(L("অন্তত একটি অধ্যায় বা বিসিএস ও বিভাগ নির্বাচন করুন, অথবা ভাইভা প্রশ্ন যোগ করুন","Select at least one chapter, or BCS and section, or add viva questions"));
 const cfg={qn:+$("qn").value,vzn:$("vzn").value,mk:+$("mk").value,ng:+$("ng").value,tm:+$("tm").value};
-if(useB&&bnums.some(n=>!BCSL[n])){busy(L("বিসিএস প্রশ্ন লোড হচ্ছে...","Loading BCS questions..."));const e=await loadBcs(bnums);if(e==="session")return;if(e){alert(e);examSetup();return}}
+if(useB&&bnums.some(n=>!BCSL[n])){busy(L("বিসিএস প্রশ্ন লোড হচ্ছে...","Loading BCS questions..."));const e=await loadBcs(bnums,(d,t)=>busy(L("বিসিএস প্রশ্ন লোড হচ্ছে... ","Loading BCS questions... ")+bn(d)+"/"+bn(t)));if(e==="session")return;if(e){alert(e);examSetup();return}}
 let q=shuf(Q.filter(x=>p.includes(x[0])).concat(useB?BCS.filter(x=>bk.includes(x[0])&&bnums.includes(x[5])):[])).slice(0,cfg.qn);
 let vv=[];if(useV){const n=cfg.vzn;vv=shuf(VIVA);if(n!=="all")vv=vv.slice(0,+n)}
 S={q,vv,a:q.map(()=>-1),va:vv.map(()=>-1),sh:vv.map(()=>false),i:0,mk:cfg.mk,ng:cfg.ng,left:cfg.tm*60,running:true};
