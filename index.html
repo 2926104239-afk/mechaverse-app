@@ -132,9 +132,25 @@ $("drP").innerHTML=`<div class="h"><b>BAKIR's Mechaverse</b><small>Mechanical En
 ${it("🏠",L("হোম","Home"),"goHome()")}${it("🔄",L("রিফ্রেশ","Refresh"),"doRefresh()")}${it("📤",L("অ্যাপ শেয়ার করুন","Share the app"),"doShare()")}${it("⚠️",L("সমস্যা জানান","Report a Problem"),"reportPage()")}${it("📞",L("যোগাযোগ","Contact"),"contactPage()")}${it("ℹ️",L("অ্যাপ সম্পর্কে","About"),"aboutPage()")}${it("🔒",L("গোপনীয়তা নীতি","Privacy Policy"),"privacyPage()")}${it("⎋",L("লগআউট","Log out"),"logout()")}`;
 d.style.display="block"}
 function doRefresh(){if(S.running&&!confirm(L("পরীক্ষা চলছে। রিফ্রেশ করলে উত্তর হারিয়ে যাবে। চালিয়ে যাবেন?","An exam is running. Refreshing will lose your answers. Continue?")))return;savePos();location.reload()}
-async function doShare(){const t=L("BAKIR's Mechaverse — মেকানিক্যাল ও পাওয়ার ইঞ্জিনিয়ারিং MCQ, ভাইভা ও BCS প্রশ্নব্যাংক।","BAKIR's Mechaverse — Mechanical & Power Engineering MCQs, viva and BCS question bank.")+"\n\n"+L("🌐 ওয়েবে খুলুন: ","🌐 Open on web: ")+SITE+"welcome.html\n"+L("📲 APK ডাউনলোড (অ্যান্ড্রয়েড): ","📲 Download APK (Android): ")+APK_URL+"\n\n"+L("ব্যবহার করতে অ্যাপ খুলে প্রবেশের অনুরোধ পাঠান।","Open the app and request access to start.");
-try{if(navigator.share){await navigator.share({title:"BAKIR's Mechaverse",text:t});return}}catch(e){if(e&&e.name==="AbortError")return}
-window.open("https://wa.me/?text="+encodeURIComponent(t),"_blank","noopener")}
+function shareParts(){const intro=L("BAKIR's Mechaverse — মেকানিক্যাল ও পাওয়ার ইঞ্জিনিয়ারিং MCQ, ভাইভা ও BCS প্রশ্নব্যাংক।","BAKIR's Mechaverse — Mechanical & Power Engineering MCQs, viva and BCS question bank.");const web=SITE+"welcome.html";const full=intro+"\n\n"+L("🌐 ওয়েবে খুলুন: ","🌐 Open on web: ")+web+"\n"+L("📲 APK ডাউনলোড (অ্যান্ড্রয়েড): ","📲 Download APK (Android): ")+APK_URL+"\n\n"+L("ব্যবহার করতে অ্যাপ খুলে প্রবেশের অনুরোধ পাঠান।","Open the app and request access to start.");return{intro,web,full}}
+async function copyText(txt,btn,ok){let done=false;try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(txt);done=true}}catch(e){}
+if(!done){try{const ta=document.createElement("textarea");ta.value=txt;ta.setAttribute("readonly","");ta.style.cssText="position:fixed;top:0;left:0;opacity:0";document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,txt.length);done=document.execCommand("copy");document.body.removeChild(ta)}catch(e){}}
+if(btn){const b=btn.querySelector("b"),o=b.textContent;b.textContent=done?"✅ "+ok:L("কপি করা যায়নি, নিচের লেখা চেপে ধরে কপি করুন","Copy failed — long-press the text below to copy");setTimeout(()=>{b.textContent=o},2200)}}
+async function doShare(){const P=shareParts();
+try{if(navigator.share){await navigator.share({title:"BAKIR's Mechaverse",text:P.full});return}}catch(e){if(e&&e.name==="AbortError")return}
+sharePage()}
+function sharePage(){CUR=sharePage;POS=["menu"];const P=shareParts();const e=encodeURIComponent;
+window.SH=P;
+show(`<div class="hero"><h2 style="margin:0 0 4px">📤 ${L("অ্যাপ শেয়ার করুন","Share the app")}</h2><small>${L("কপি করে মেসেঞ্জার, টেলিগ্রাম বা যেকোনো মাধ্যমে পাঠান","Copy and send via Messenger, Telegram or anywhere")}</small></div>
+<div class="card">
+<div class="lk" onclick="copyText(SH.full,this,L('কপি হয়েছে','Copied'))"><span class="mi">📋</span><span><b>${L("পুরো মেসেজ কপি করুন","Copy full message")}</b><small>${L("ওয়েব ও APK দুই লিংকসহ","With both web and APK links")}</small></span></div>
+<div class="lk" onclick="copyText(SH.web,this,L('কপি হয়েছে','Copied'))"><span class="mi">🌐</span><span><b>${L("ওয়েব লিংক কপি করুন","Copy web link")}</b><small>${P.web}</small></span></div>
+<div class="lk" onclick="copyText(APK_URL,this,L('কপি হয়েছে','Copied'))"><span class="mi">📲</span><span><b>${L("APK লিংক কপি করুন","Copy APK link")}</b><small>${APK_URL}</small></span></div>
+</div>
+<div class="card">
+${lk("💬","WhatsApp","","https://wa.me/?text="+e(P.full))}${lk("✈️","Telegram","","https://t.me/share/url?url="+e(P.web)+"&text="+e(P.intro+"\n📲 APK: "+APK_URL))}${lk("💬",L("এসএমএস","SMS"),"","sms:?&body="+e(P.full))}${lk("✉️",L("ইমেইল","Email"),"","mailto:?subject="+e("BAKIR's Mechaverse")+"&body="+e(P.full))}
+</div>
+<div class="card"><small style="color:var(--mu)">${L("মেসেঞ্জার বা অন্য অ্যাপে পাঠাতে উপরের ‘পুরো মেসেজ কপি করুন’ চেপে সেখানে পেস্ট করুন।","To use Messenger or any other app, tap ‘Copy full message’ above and paste it there.")}</small></div>`,menu)}
 function lk(ic,t,sub,h){return`<a class="lk" href="${h}" target="_blank" rel="noopener"><span class="mi">${ic}</span><span><b>${t}</b><small>${sub}</small></span></a>`}
 function contactPage(){CUR=contactPage;POS=["menu"];show(`<div class="hero"><h2 style="margin:0 0 4px">📞 ${L("যোগাযোগ","Contact")}</h2><small>${L("প্রশ্ন, পরামর্শ বা সমস্যায় যোগাযোগ করুন","Reach out for questions, suggestions or problems")}</small></div>
 <div class="card">${lk("💬","WhatsApp","01868219227","https://wa.me/"+CT.wa)}${lk("✈️","Telegram","01868219227","https://t.me/+"+CT.wa)}${lk("✉️",L("ইমেইল","Email"),CT.mail,"mailto:"+CT.mail)}${lk("📘","Facebook","sheikhmuhammadbakir.1",CT.fb)}${lk("📸","Instagram","sheikhmuhammadbakir",CT.ig)}</div>
