@@ -137,7 +137,8 @@ async function copyText(txt,btn,ok){let done=false;try{if(navigator.clipboard&&w
 if(!done){try{const ta=document.createElement("textarea");ta.value=txt;ta.setAttribute("readonly","");ta.style.cssText="position:fixed;top:0;left:0;opacity:0";document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,txt.length);done=document.execCommand("copy");document.body.removeChild(ta)}catch(e){}}
 if(btn){const b=btn.querySelector("b"),o=b.textContent;b.textContent=done?"✅ "+ok:L("কপি করা যায়নি, নিচের লেখা চেপে ধরে কপি করুন","Copy failed — long-press the text below to copy");setTimeout(()=>{b.textContent=o},2200)}}
 async function doShare(){const P=shareParts();
-try{if(navigator.share){await navigator.share({title:"BAKIR's Mechaverse",text:P.full});return}}catch(e){if(e&&e.name==="AbortError")return}
+const mob=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+try{if(mob&&navigator.share){await navigator.share({title:"BAKIR's Mechaverse",text:P.full});return}}catch(e){if(e&&e.name==="AbortError")return}
 sharePage()}
 function sharePage(){CUR=sharePage;POS=["menu"];const P=shareParts();const e=encodeURIComponent;
 window.SH=P;
