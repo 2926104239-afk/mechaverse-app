@@ -234,8 +234,8 @@ bcsStat();if(!keep)window.scrollTo(0,0)}
 function bcsPg(d){BS.page+=d;bcsRender()}
 function bcsAns(i,k){if(BS.ans[i]!==undefined||BS.mode=="a")return;BS.ans[i]=k;const e=$("bq"+i);if(e)e.outerHTML=bcsCard(i,+e.dataset.n);bcsStat()}
 function examSetup(){CUR=examSetup;POS=["examSetup"];clearInterval(S.t);S.running=false;show(`<div class="hero"><h2 style="margin:0 0 4px">📝 ${L("পরীক্ষা","Exam")}</h2><small>${L("আপনার পছন্দ মতো অধ্যায়, সময় ও নম্বর ঠিক করুন","Choose chapters, time and marks as you like")}</small></div>
-<div class="grid"><div class="card"><label class="f">⏰ ${L("সময়","Time")}<select id="tm">${[10,20,30,60,120].map(m=>`<option value="${m}" ${m==30?"selected":""}>${bn(m)} ${L("মিনিট","min")}</option>`).join("")}</select></label></div>
-<div class="card"><label class="f">📚 ${L("MCQ-র সংখ্যা","Number of MCQs")}<select id="qn">${[10,20,50,100,150,200].map(m=>`<option value="${m}">${bn(m)}${L("টি","")}</option>`).join("")}</select></label></div>
+<div class="grid"><div class="card"><label class="f">⏰ ${L("সময়","Time")}<select id="tm">${Array.from({length:12},(_,i)=>(i+1)*10).map(m=>`<option value="${m}" ${m==30?"selected":""}>${bn(m)} ${L("মিনিট","min")}</option>`).join("")}</select></label></div>
+<div class="card"><label class="f">📚 ${L("MCQ-র সংখ্যা","Number of MCQs")}<select id="qn" onchange="autoTime()">${Array.from({length:20},(_,i)=>(i+1)*10).map(m=>`<option value="${m}">${bn(m)}${L("টি","")}</option>`).join("")}</select></label></div>
 <div class="card"><label class="f">✅ ${L("প্রতি প্রশ্নে মার্ক","Marks per question")}<select id="mk"><option value="1">${bn(1)}</option><option value="2">${bn(2)}</option></select></label></div>
 <div class="card"><label class="f">❌ ${L("নেগেটিভ মার্কিং","Negative marking")}<select id="ng"><option value="0">${bn(0)}</option><option value="0.25" selected>${bn("-0.25")}</option><option value="0.5">${bn("-0.5")}</option></select></label></div></div>
 <div class="card"><div class="top"><span>${L("অধ্যায়সমূহ","Chapters")}</span><a href="#" onclick="all();return false" style="color:var(--pr)">${L("সব নির্বাচন","Select all")}</a></div>${chapList()}</div>
@@ -244,6 +244,7 @@ function examSetup(){CUR=examSetup;POS=["examSetup"];clearInterval(S.t);S.runnin
 ${BCS.length?`<div class="card"><label class="row" style="border:0"><input type="checkbox" id="bz" onchange="document.getElementById('bzs').style.display=this.checked?'block':'none'"><span><b>🏛️ ${L("বিসিএস প্রশ্ন যোগ করুন","Include BCS questions")}</b><br><small class="viva-note">${L("ঐচ্ছিক। নির্বাচিত বিভাগের বিসিএস প্রিলিমিনারি প্রশ্ন MCQ-র সাথে মিশে আসবে।","Optional. BCS preliminary questions from the chosen sections are mixed with the MCQs.")}</small></span></label>
 <div id="bzs" style="display:none">${BCS_SECS.map((c,i)=>{const n=BCS.filter(q=>q[0]==i).length;return `<label class="row"><input type="checkbox" class="bk" value="${i}" checked ${n?"":"disabled"}><span>${bsec(i)}</span><b>${bn(n)}${L("টি","")}</b></label>`}).join("")}</div></div>`:""}
 <button class="btn" onclick="start()">${L("পরীক্ষা শুরু করুন","Start exam")}</button>`,menu)}
+function autoTime(){const q=+$("qn").value,t=Math.min(120,Math.max(10,Math.ceil(q*0.6/10)*10));$("tm").value=String(t)}
 function start(){const p=picked(),useV=$("vz").checked,bk=($("bz")&&$("bz").checked)?[...document.querySelectorAll(".bk:checked")].map(e=>+e.value):[],useB=bk.length>0;if(!p.length&&!useV&&!useB)return alert(L("অন্তত একটি অধ্যায় বা বিসিএস বিভাগ নির্বাচন করুন, অথবা ভাইভা প্রশ্ন যোগ করুন","Select at least one chapter or BCS section, or add viva questions"));
 let q=shuf(Q.filter(x=>p.includes(x[0])).concat(BCS.filter(x=>bk.includes(x[0])))).slice(0,+$("qn").value);
 let vv=[];if(useV){const n=$("vzn").value;vv=shuf(VIVA);if(n!=="all")vv=vv.slice(0,+n)}
@@ -262,7 +263,11 @@ function rate(v){S.va[S.i-S.q.length]=v;exam()}
 function go(d){S.i+=d;exam()}
 function finish(){CUR=finish;POS=["menu"];clearInterval(S.t);S.running=false;let c=0,w=0;S.q.forEach((x,i)=>{if(S.a[i]<0)return;S.a[i]==x[3]?c++:w++});
 const sc=Math.round((c*S.mk-w*S.ng)*100)/100,vy=S.va.filter(v=>v==1).length,vn=S.va.filter(v=>v==0).length;
-show((S.q.length?`<div class="card"><div class="big">${bn(sc)}</div><div class="st"><div>✅ ${L("সঠিক","Correct")}<br><b>${bn(c)}</b></div><div>❌ ${L("ভুল","Wrong")}<br><b>${bn(w)}</b></div><div>⏭ ${L("বাদ","Skipped")}<br><b>${bn(S.q.length-c-w)}</b></div></div></div>`:"")
+const tot=S.q.length*S.mk,att=c+w,acc=att?Math.round(c/att*1000)/10:0,pt=S.q.length?Math.round(c/S.q.length*1000)/10:0,cm=c*S.mk,wm=Math.round(w*S.ng*100)/100;
+show((S.q.length?`<div class="card"><div class="viva-note" style="text-align:center">${L("আপনার মোট নম্বর","Your total score")}</div><div class="big">${bn(sc)} / ${bn(tot)}</div>
+<div class="viva-note" style="text-align:center;margin-top:6px">✅ ${bn(c)} × ${bn(S.mk)} = <b>+${bn(cm)}</b> &nbsp;·&nbsp; ❌ ${bn(w)} × ${bn(S.ng)} = <b>−${bn(wm)}</b></div>
+<div class="st"><div>${L("উত্তর দেওয়া প্রশ্নের মধ্যে সঠিক","Correct of attempted")}<br><b>${bn(acc)}%</b></div><div>${L("মোট প্রশ্নের মধ্যে সঠিক","Correct of all questions")}<br><b>${bn(pt)}%</b></div></div>
+<div class="st"><div>✅ ${L("সঠিক","Correct")}<br><b>${bn(c)}</b></div><div>❌ ${L("ভুল","Wrong")}<br><b>${bn(w)}</b></div><div>⏭ ${L("বাদ","Skipped")}<br><b>${bn(S.q.length-c-w)}</b></div></div></div>`:"")
 +(S.vv.length?`<div class="card"><b>🎤 ${L("ভাইভা স্ব-মূল্যায়ন","Viva self-assessment")}</b><div class="st"><div>✅ ${L("পেরেছি","Knew it")}<br><b>${bn(vy)}</b></div><div>❌ ${L("পারিনি","Didn't")}<br><b>${bn(vn)}</b></div><div>⏭ ${L("দেখিনি","Not rated")}<br><b>${bn(S.vv.length-vy-vn)}</b></div></div></div>`:"")
 +S.q.map((x,i)=>book(x,i,S.a[i])).join("")
 +(S.vv.length?`<h3>${L("ভাইভা প্রশ্নের উত্তর","Viva answers")}</h3>`+S.vv.map((x,j)=>`<div class="viva-item card"><details><summary>${bn(j+1)}. ${mx(x.q)} ${S.va[j]==1?"✅":S.va[j]==0?"❌":""}</summary><div class="viva-answer">${mx(x.a)}</div>${vfu(x.f,1)}</details></div>`).join(""):"")
