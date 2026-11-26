@@ -77,6 +77,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .lk .mi{font-size:22px;min-width:30px;text-align:center}.lk small{display:block;color:var(--mu);word-break:break-all}
 .pv h4{margin:16px 0 4px;color:var(--pr)}.pv p,.pv li{line-height:1.8;font-size:15px}.pv ul{padding-left:20px;margin:4px 0}
 textarea.viva-search{min-height:130px;resize:vertical}
+html,body{overscroll-behavior-y:contain}
 </style>
 </head>
 <body>
@@ -109,6 +110,8 @@ const ps=s.split("\n").map(l=>{const m=l.match(/^\s*\$([^$]+)\$\s*$/);return m&&
 let o="";ps.forEach((p,i)=>{if(i&&!p.d&&!ps[i-1].d)o+="\n";o+=p.h});return o}
 const vfu=(l,d)=>l&&l.length?`<div class="viva-fu"><div class="viva-fut">🔗 ${L("এরপর যা জিজ্ঞেস করতে পারে","Possible next questions")}</div>${l.map(y=>`<details class="fu${d}"><summary>↳ ${mx(y.q)}</summary><div class="viva-answer">${mx(y.a)}</div>${vfu(y.f,d+1)}</details>`).join("")}</div>`:"";
 let BK=null;
+(function(){let y0=0;addEventListener("touchstart",e=>{y0=e.touches[0].clientY},{passive:true});
+addEventListener("touchmove",e=>{if(window.scrollY<=0&&e.touches[0].clientY>y0&&e.cancelable&&!(e.target.closest&&e.target.closest("#dr")))e.preventDefault()},{passive:false})})();
 function show(html,back,keep){A.innerHTML=html;BK=back||null;$("nb").style.display=back?"flex":"none";if(!keep)window.scrollTo(0,0)}
 function goBack(){if(S.running&&!confirm(L("পরীক্ষা ছেড়ে বের হবেন? উত্তর হারিয়ে যাবে।","Leave the exam? Your answers will be lost.")))return;if(S.running){clearInterval(S.t);S.running=false;S.i=0}if(BK)BK();else menu()}
 function goHome(){if(S.running&&!confirm(L("পরীক্ষা ছেড়ে বের হবেন? উত্তর হারিয়ে যাবে।","Leave the exam? Your answers will be lost.")))return;clearInterval(S.t);S.running=false;menu()}
