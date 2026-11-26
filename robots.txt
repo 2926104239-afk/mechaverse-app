@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://2926104239-afk.github.io/mechaverse-app/sitemap.xml

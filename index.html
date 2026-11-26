@@ -129,8 +129,8 @@ ${it("🏠",L("হোম","Home"),"goHome()")}${it("🔄",L("রিফ্রে�
 d.style.display="block"}
 function doRefresh(){if(S.running&&!confirm(L("পরীক্ষা চলছে। রিফ্রেশ করলে উত্তর হারিয়ে যাবে। চালিয়ে যাবেন?","An exam is running. Refreshing will lose your answers. Continue?")))return;savePos();location.reload()}
 async function doShare(){const t=L("BAKIR's Mechaverse — মেকানিক্যাল ও পাওয়ার ইঞ্জিনিয়ারিং MCQ, ভাইভা ও BCS প্রশ্নব্যাংক। ব্যবহার করতে অ্যাপ খুলে প্রবেশের অনুরোধ পাঠান।","BAKIR's Mechaverse — Mechanical & Power Engineering MCQs, viva and BCS question bank. Open it and request access to start.");
-try{if(navigator.share){await navigator.share({title:"BAKIR's Mechaverse",text:t,url:SITE});return}}catch(e){if(e&&e.name==="AbortError")return}
-window.open("https://wa.me/?text="+encodeURIComponent(t+" "+SITE),"_blank","noopener")}
+try{if(navigator.share){await navigator.share({title:"BAKIR's Mechaverse",text:t,url:SITE+"welcome.html"});return}}catch(e){if(e&&e.name==="AbortError")return}
+window.open("https://wa.me/?text="+encodeURIComponent(t+" "+SITE+"welcome.html"),"_blank","noopener")}
 function lk(ic,t,sub,h){return`<a class="lk" href="${h}" target="_blank" rel="noopener"><span class="mi">${ic}</span><span><b>${t}</b><small>${sub}</small></span></a>`}
 function contactPage(){CUR=contactPage;POS=["menu"];show(`<div class="hero"><h2 style="margin:0 0 4px">📞 ${L("যোগাযোগ","Contact")}</h2><small>${L("প্রশ্ন, পরামর্শ বা সমস্যায় যোগাযোগ করুন","Reach out for questions, suggestions or problems")}</small></div>
 <div class="card">${lk("💬","WhatsApp","01868219227","https://wa.me/"+CT.wa)}${lk("✈️","Telegram","01868219227","https://t.me/+"+CT.wa)}${lk("✉️",L("ইমেইল","Email"),CT.mail,"mailto:"+CT.mail)}${lk("📘","Facebook","sheikhmuhammadbakir.1",CT.fb)}${lk("📸","Instagram","sheikhmuhammadbakir",CT.ig)}</div>
