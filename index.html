@@ -292,10 +292,12 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 async function call(o){const r=await fetch(API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(o)});return r.json()}
 const NET=()=>L("ইন্টারনেট সংযোগ নেই বা সার্ভারে পৌঁছানো যায়নি","No internet connection or the server could not be reached");
 function busy(t){$("nb").style.display="none";A.innerHTML=`<div class="card" style="text-align:center;padding:30px 14px">${esc(t)}</div>`}
+function otpContact(){return`<div class="card" style="border-color:var(--pr)"><b>📩 ${L("ওটিপির জন্য যোগাযোগ করুন","Contact for OTP")}</b><small style="display:block;color:var(--mu);margin-top:4px">${L("অনুরোধ পাঠানোর পর ওটিপি আপনার ফোনে যায় না। মালিকের সাথে যোগাযোগ করলে তবেই ওটিপি পাবেন।","The OTP is not sent to your phone. You will get it only after contacting the owner.")}</small>${lk("💬","WhatsApp","01868219227","https://wa.me/"+CT.wa)}${lk("✈️","Telegram","01868219227","https://t.me/+"+CT.wa)}</div>`}
 function loginScreen(msg){CUR=()=>loginScreen(msg);
 clearExpiryTimer();clearInterval(S.t);S.running=false;$("nb").style.display="none";$("lo").style.display="none";$("mb").style.display="none";drawer(0);
 const rid=store.get("mv_req");
 A.innerHTML=`<div class="hero"><h2 style="margin:0 0 4px">${L("প্রবেশের অনুমতি","Request Access")}</h2><small>${L("পরীক্ষা দিতে নাম ও ফোন নম্বর দিয়ে অনুরোধ পাঠান। অ্যাপের মালিক আপনাকে একটি ওটিপি দেবেন।","Send a request with your name and phone number. The app owner will give you an OTP.")}</small></div>
+${otpContact()}
 <div class="card">${msg?`<p class="viva-note" style="color:var(--no);margin-top:0">${esc(msg)}</p>`:""}
 <label class="f">${L("আপনার নাম","Your name")}<input id="lgN" class="viva-search" autocomplete="name" maxlength="60"></label>
 <label class="f">${L("ফোন নম্বর","Phone number")}<input id="lgP" class="viva-search" type="tel" inputmode="tel" autocomplete="tel" maxlength="20"></label>
@@ -312,6 +314,7 @@ else{loginScreen(r.err||L("কিছু একটা ভুল হয়েছ�
 catch(e){loginScreen(NET())}}
 function otpScreen(id,msg){CUR=()=>otpScreen(id,msg);
 A.innerHTML=`<div class="hero"><h2 style="margin:0 0 4px">${L("ওটিপি দিন","Enter OTP")}</h2><small>${L("মালিকের কাছ থেকে পাওয়া ৬ সংখ্যার ওটিপি লিখুন (১০ মিনিট বৈধ)।","Enter the 6-digit OTP from the owner (valid for 10 minutes).")}</small></div>
+${otpContact()}
 <div class="card">${msg?`<p class="viva-note" style="margin-top:0">${esc(msg)}</p>`:""}
 <input id="otp" class="viva-search" type="tel" inputmode="numeric" maxlength="6" placeholder="------" style="text-align:center;font-size:24px;letter-spacing:6px" autocomplete="one-time-code">
 <button class="btn" id="otB" onclick="doVerify('${esc(id)}')">${L("প্রবেশ করুন","Enter")}</button>
