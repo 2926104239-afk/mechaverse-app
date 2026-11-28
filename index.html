@@ -47,6 +47,7 @@ select{width:100%;margin-top:6px;padding:11px;border-radius:12px;border:1px soli
 main{padding-bottom:96px}
 #nb{display:none;position:fixed;left:0;right:0;bottom:0;gap:10px;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:1px solid var(--bd);z-index:9}
 #nb button{flex:1;padding:12px;border-radius:12px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font:inherit;font-weight:700}
+.tabs{display:flex;gap:4px;margin:0 0 12px;padding:4px;background:var(--card);border:1px solid var(--bd);border-radius:16px}.tabs button{flex:1;border:0;background:none;color:var(--mu);font:inherit;font-weight:700;font-size:12.5px;line-height:1.25;padding:8px 2px;border-radius:12px;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}.tabs button.on{background:var(--pr);color:#fff}.tabs .ti{font-size:18px}.sub{display:flex;gap:8px;margin:0 0 12px}.sub button{flex:1;padding:9px 6px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font:inherit;font-weight:600}.sub button.on{border-color:var(--pr);color:var(--pr);box-shadow:inset 0 0 0 1px var(--pr)}.grp{margin:12px 2px 6px;font-weight:700;color:var(--mu);font-size:14px}
 .mn{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:18px 16px;margin-bottom:12px;border-radius:16px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font:inherit}
 .mn:disabled{opacity:.5}.mn b{display:block;font-size:18px}.mn small{color:var(--mu);font-size:13px}
 .mn .mi{font-size:28px;min-width:40px;text-align:center}.mn.ch{padding:13px 14px}.mn.ch .mi{font-size:18px;font-weight:800;color:var(--pr);background:rgba(91,75,213,.12);border-radius:10px;padding:6px 0}.mn.ch b{font-size:16px}
@@ -93,13 +94,21 @@ document.addEventListener("keydown",ev=>{const k=(ev.key||"").toLowerCase();if(e
 let LANG="bn";try{LANG=localStorage.getItem("mv_lang")||"bn"}catch(e){}
 const L=(b,e)=>LANG==="en"?e:b;
 const bn=n=>LANG==="en"?String(n):String(n).replace(/\d/g,d=>"০১২৩৪৫৬৭৮৯"[d]).replace("-","−");
-let CH=[],Q=[],VIVA=[],VIVA_CATS=[],UNITS=[],BCS=[],BCS_SECS=[];
+let CH=[],Q=[],VIVA=[],VIVA_CATS=[],UNITS=[],BCS=[],BCS_SECS=[],CHG=[];
+/* অধ্যায়ের গ্রুপ: ডেটায় CHG ("dept"/"eng") থাকলে সেটি, নইলে নাম ইংরেজি অক্ষরে শুরু হলে "eng", অন্যথায় "dept" */
+const chGroup=i=>CHG[i]||(/^[A-Za-z]/.test(String(CH[i]||"").trim())?"eng":"dept");
+const uG=u=>u.g||(/^[A-Za-z]/.test(String(u.title||"").trim())?"eng":"dept");
+const uIdx=g=>UNITS.map((_,i)=>i).filter(i=>uG(UNITS[i])===g);
+const chIdx=g=>CH.map((_,i)=>i).filter(i=>chGroup(i)===g);
+let TAB="";try{TAB=localStorage.getItem("mv_tab")||""}catch(e){}
+const SUBS=(()=>{const d={nd:"bcs",dp:"mcq",ex:"pre"};try{return Object.assign(d,JSON.parse(localStorage.getItem("mv_subs")||"{}"))}catch(e){return d}})();
 const $=id=>document.getElementById(id),A=$("app");
 let S={},CUR=null,POS=null;
 function dk(){const r=document.documentElement,d=r.dataset.theme==="dark"||(!r.dataset.theme&&matchMedia("(prefers-color-scheme:dark)").matches);r.dataset.theme=d?"light":"dark"}
 function applyLang(){document.documentElement.lang=LANG==="en"?"en":"bn";$("lg").textContent=LANG==="en"?"বাংলা":"EN";$("lo").setAttribute("aria-label",L("বের হন","Log out"));$("nbB").textContent=L("← পিছনে","← Back");$("nbH").textContent=L("🏠 হোম","🏠 Home")}
 function toggleLang(){LANG=LANG==="en"?"bn":"en";try{localStorage.setItem("mv_lang",LANG)}catch(e){}applyLang();if(CUR)CUR()}
-function chapList(){return CH.map((c,i)=>{const n=Q.filter(q=>q[0]==i).length;return `<label class="row" style="${n?"":"opacity:.5"}"><input type="checkbox" class="ck" value="${i}" ${n?"":"disabled"}><span>${L("অধ্যায়","Chapter")} ${bn(i+1)}: ${c}</span><b>${n?bn(n)+L("টি","")+"":L("শীঘ্রই","Soon")}</b></label>`}).join("")}
+function chapList(){const gs=[["dept",L("ডিপার্টমেন্ট","Department")],["eng",L("ইংলিশ","English")]].filter(x=>chIdx(x[0]).length);
+return gs.map(([g,t])=>(gs.length>1?`<div class="grp">${t}</div>`:"")+chIdx(g).map((i,k)=>{const c=CH[i],n=Q.filter(q=>q[0]==i).length;return `<label class="row" style="${n?"":"opacity:.5"}"><input type="checkbox" class="ck" value="${i}" ${n?"":"disabled"}><span>${L("অধ্যায়","Chapter")} ${bn(k+1)}: ${c}</span><b>${n?bn(n)+L("টি","")+"":L("শীঘ্রই","Soon")}</b></label>`}).join("")).join("")}
 function picked(){return[...document.querySelectorAll(".ck:checked")].map(e=>+e.value)}
 function all(){const c=[...document.querySelectorAll(".ck")],on=c.some(e=>!e.checked);c.forEach(e=>e.checked=on)}
 const shuf=a=>a.slice().sort(()=>Math.random()-.5);
@@ -117,12 +126,52 @@ function goBack(){if(S.running&&!confirm(L("পরীক্ষা ছেড়�
 function goHome(){if(S.running&&!confirm(L("পরীক্ষা ছেড়ে বের হবেন? উত্তর হারিয়ে যাবে।","Leave the exam? Your answers will be lost.")))return;clearInterval(S.t);S.running=false;menu()}
 function splash(){CUR=splash;clearInterval(S.t);show(`<div class="splash"><div class="sp1">Welcome to</div><div class="sp2">BAKIR's Mechaverse</div><small>Mechanical Engineering | Power Engineering</small></div>`,null);setTimeout(()=>{if(document.querySelector(".splash"))menu()},1800)}
 function menu(){CUR=menu;POS=["menu"];clearInterval(S.t);S.running=false;
+const T=["nd","dp","vv","ex"].includes(TAB)?TAB:"dp";
+const defs={nd:[["bcs","🏛️","BCS"],["eng","🔤",L("ইংলিশ","English")]],dp:[["mcq","📖","MCQ"],["unit","📐",L("এককের ধারণা","Units")]],ex:[["pre","📝",L("প্রিলি","Prelim")],["vexam","🎤",L("ভাইভা","Viva")]]};
+const tb=(k,ic,t)=>`<button class="${T===k?"on":""}" onclick="setTab('${k}')"><span class="ti">${ic}</span>${t}</button>`;
+let s=SUBS[T],sub="";
+if(defs[T]){if(!defs[T].some(x=>x[0]===s))s=defs[T][0][0];sub=`<div class="sub">${defs[T].map(x=>`<button class="${s===x[0]?"on":""}" onclick="setSub('${x[0]}')">${x[1]} ${x[2]}</button>`).join("")}</div>`}
+const key=defs[T]?s:"vv";
+const B={bcs:()=>BCS.length?bcsBody():`<div class="card"><p class="viva-note">${L("শীঘ্রই আসছে","Coming soon")}</p></div>`,eng:()=>studyBody("eng"),mcq:()=>studyBody("dept"),unit:()=>uIdx("dept").length?unitsBody("dept"):`<div class="card"><p class="viva-note">${L("শীঘ্রই আসছে","Coming soon")}</p></div>`,pre:preBody,vexam:vexamBody,vv:vivaBody}[key];
 show(`<div class="hero"><h2 style="margin:0 0 4px">BAKIR's Mechaverse</h2><small>${L("কী করতে চান?","What would you like to do?")}</small></div>
-<button class="mn" onclick="study()"><span class="mi">📖</span><span><b>${L("পড়াশোনা","Study")}</b><small>${L("অধ্যায় ভিত্তিক MCQ, উত্তর ও ব্যাখ্যাসহ","Chapter-wise MCQs with answers and explanations")}</small></span></button>
-<button class="mn" onclick="vivaHome()"><span class="mi">🎤</span><span><b>${L("ভাইভা প্রস্তুতি","Viva Preparation")}</b><small>${L("ভাইভার প্রশ্ন, উত্তর ও পরের সম্ভাব্য প্রশ্ন","Viva questions, answers and follow-up questions")}</small></span></button>
-<button class="mn" onclick="units()" ${UNITS.length?"":"disabled"}><span class="mi">📐</span><span><b>${L("এককের ধারণা","Concept of Units")}</b><small>${L("মৌলিক থেকে যৌগিক রাশি, একক রূপান্তর ও মাত্রা বিশ্লেষণ","From base to derived quantities, unit conversion and dimensional analysis")}</small></span></button>
-<button class="mn" onclick="bcsHome()" ${BCS.length?"":"disabled"}><span class="mi">🏛️</span><span><b>BCS Question Bank</b><small>${L("১০ম–৫০তম বিসিএস প্রিলিমিনারি প্রশ্ন, উত্তর ও ব্যাখ্যাসহ","10th–50th BCS preliminary questions with answers and explanations")}</small></span></button>
-<button class="mn" onclick="examSetup()"><span class="mi">📝</span><span><b>${L("পরীক্ষা","Exam")}</b><small>${L("সময় ও নম্বর ঠিক করে মডেল টেস্ট দিন","Set time and marks, then take a model test")}</small></span></button>`,null)}
+<div class="tabs" role="tablist">${tb("nd","📚",L("নন ডিপার্টমেন্ট","Non-Dept"))}${tb("dp","⚙️",L("ডিপার্টমেন্ট","Dept"))}${tb("vv","💬",L("ভাইভা প্রশ্ন","Viva Q&A"))}${tb("ex","📝",L("এক্সাম","Exam"))}</div>${sub}<div id="tabBody">${B()}</div>`,null);
+if(key==="bcs"&&BCS.length)bcsRender(1);if(key==="vv")renderViva()}
+function openTab(t,s){TAB=t;if(s)SUBS[t]=s;try{localStorage.setItem("mv_tab",t);localStorage.setItem("mv_subs",JSON.stringify(SUBS))}catch(e){}menu()}
+function setTab(t){openTab(t)}function setSub(x){openTab(TAB,x)}
+function study(g){g==="eng"?openTab("nd","eng"):openTab("dp","mcq")}
+function units(){openTab("dp","unit")}
+function vivaHome(){openTab("vv")}
+function bcsHome(){openTab("nd","bcs")}
+function examSetup(){openTab("ex","pre")}
+/* ---- ভাইভা পরীক্ষা: বোর্ডের মতো একের পর এক প্রশ্ন ---- */
+function vexamBody(){return `<p class="viva-note" style="margin:0 2px 10px">${L("ভাইভা বোর্ডে যেভাবে প্রশ্ন করা হয়, সেভাবে একের পর এক প্রশ্ন আসবে। উত্তর বলুন, তারপর নমুনা উত্তর দেখে নিজেকে মূল্যায়ন করুন।","Questions come one after another, like a viva board. Give your answer, then check the sample answer and rate yourself.")}</p>
+<div class="grid"><div class="card"><label class="f">🎤 ${L("প্রশ্নের সংখ্যা","Number of questions")}<select id="vxn">${[5,10,20,30,50,100].map(m=>`<option value="${m}" ${m==10?"selected":""}>${bn(m)}${L("টি","")}</option>`).join("")}<option value="all">${L("সবগুলো","All")}</option></select></label></div>
+<div class="card"><label class="f">⏰ ${L("প্রতি প্রশ্নে সময়","Time per question")}<select id="vxt"><option value="0">${L("সময়সীমা নেই","No limit")}</option>${[30,60,90,120].map(m=>`<option value="${m}">${bn(m)} ${L("সেকেন্ড","sec")}</option>`).join("")}</select></label></div></div>
+<div class="card"><div class="top"><span>${L("বিভাগসমূহ","Categories")}</span><a href="#" onclick="all();return false" style="color:var(--pr)">${L("সব নির্বাচন","Select all")}</a></div>${VIVA_CATS.map((c,i)=>{const k=VIVA.filter(x=>VIVA_CATS.indexOf(x.cat)===i).length;return `<label class="row" style="${k?"":"opacity:.5"}"><input type="checkbox" class="ck" value="${i}" ${k?"checked":"disabled"}><span>${c}</span><b>${bn(k)}${L("টি","")}</b></label>`}).join("")}</div>
+<div class="card"><label class="row" style="border:0"><input type="checkbox" id="vxs" checked><span>${L("প্রশ্ন এলোমেলো ক্রমে আসুক","Ask in random order")}</span></label></div>
+<button class="btn" onclick="vexamStart()">${L("ভাইভা শুরু করুন","Start viva")}</button>`}
+function vexamStart(){const cs=picked();if(!cs.length)return alert(L("অন্তত একটি বিভাগ নির্বাচন করুন","Select at least one category"));
+let l=VIVA.filter(x=>cs.includes(VIVA_CATS.indexOf(x.cat)));if($("vxs").checked)l=shuf(l);const n=$("vxn").value;if(n!=="all")l=l.slice(0,+n);
+if(!l.length)return alert(L("এই বিভাগে প্রশ্ন নেই","No questions in these categories"));
+clearInterval(S.t);S={viva:true,vv:l,va:l.map(()=>-1),sh:l.map(()=>false),i:0,seen:1,lq:-1,per:+$("vxt").value,left:0,running:true};vexamQ()}
+function vxTick(){const e=$("vxT");if(e)e.textContent=bn(String(Math.floor(S.left/60)).padStart(2,"0"))+":"+bn(String(S.left%60).padStart(2,"0"))}
+function vexamQ(){CUR=vexamQ;POS=["menu"];clearInterval(S.t);const j=S.i,x=S.vv[j],T=S.vv.length;S.seen=Math.max(S.seen,j+1);
+if(S.lq!==j){S.lq=j;S.left=S.per}
+if(S.per&&!S.sh[j]&&S.left>0)S.t=setInterval(()=>{S.left--;vxTick();if(S.left<=0){clearInterval(S.t);vexamReveal()}},1000);
+const last=j>=T-1;
+show(`<div class="card"><div class="top"><span>🎤 ${L("প্রশ্ন","Question")} ${bn(j+1)}/${bn(T)}</span>${S.per&&!S.sh[j]?`<span class="tm">⏱ <span id="vxT"></span></span>`:""}</div></div>
+<div class="card"><span class="viva-note">${L("বোর্ডের প্রশ্ন — আগে নিজে উত্তর দিন","Board question — answer it yourself first")}</span><p style="font-size:18px"><b>${mx(x.q)}</b></p>
+${S.sh[j]?`<div class="viva-answer">${mx(x.a)}</div>${vfu(x.f,1)}<div class="nav"><button class="btn ${S.va[j]==1?"":"g"}" onclick="vexamRate(1)">✅ ${L("পেরেছি","I knew it")}</button><button class="btn ${S.va[j]==0?"":"g"}" onclick="vexamRate(0)">❌ ${L("পারিনি","I didn't")}</button></div>
+<button class="btn" onclick="vexamNext()">${last?L("ফলাফল দেখুন","See result"):L("পরের প্রশ্ন →","Next question →")}</button>`:`<button class="btn" onclick="vexamReveal()">${L("উত্তর দেখুন","Show answer")}</button><button class="btn g" onclick="vexamNext()">${L("এড়িয়ে যান →","Skip →")}</button>`}</div>
+<button class="btn g" onclick="if(confirm('${L("ভাইভা শেষ করবেন?","End the viva?")}'))vexamFinish()">${L("ভাইভা শেষ করুন","End viva")}</button>`,()=>openTab("ex","vexam"),true);vxTick();window.scrollTo(0,0)}
+function vexamReveal(){clearInterval(S.t);S.sh[S.i]=true;vexamQ()}
+function vexamRate(v){S.va[S.i]=v;vexamQ()}
+function vexamNext(){if(S.i>=S.vv.length-1)return vexamFinish();S.i++;vexamQ()}
+function vexamFinish(){CUR=vexamFinish;POS=["menu"];clearInterval(S.t);S.running=false;const n=S.seen,l=S.vv.slice(0,n),va=S.va.slice(0,n),y=va.filter(v=>v==1).length,w=va.filter(v=>v==0).length,pc=y+w?Math.round(y/(y+w)*1000)/10:0;
+show(`<div class="card"><div class="viva-note" style="text-align:center">🎤 ${L("ভাইভা স্ব-মূল্যায়ন","Viva self-assessment")}</div><div class="big">${bn(y)} / ${bn(n)}</div>
+<div class="viva-note" style="text-align:center">${L("মূল্যায়ন করা প্রশ্নের মধ্যে ঠিক","Right of rated")}: <b>${bn(pc)}%</b></div>
+<div class="st"><div>✅ ${L("পেরেছি","Knew it")}<br><b>${bn(y)}</b></div><div>❌ ${L("পারিনি","Didn't")}<br><b>${bn(w)}</b></div><div>⏭ ${L("মূল্যায়ন হয়নি","Not rated")}<br><b>${bn(n-y-w)}</b></div></div></div>
+<h3>${L("প্রশ্ন ও উত্তর","Questions and answers")}</h3>`+l.map((x,j)=>`<div class="viva-item card"><details><summary>${bn(j+1)}. ${mx(x.q)} ${va[j]==1?"✅":va[j]==0?"❌":""}</summary><div class="viva-answer">${mx(x.a)}</div>${vfu(x.f,1)}</details></div>`).join("")+`<button class="btn" onclick="openTab('ex','vexam')">${L("নতুন ভাইভা","New viva")}</button>`,()=>openTab("ex","vexam"))}
 const SITE="https://2926104239-afk.github.io/mechaverse-app/";
 const APK_URL="https://github.com/2926104239-afk/mechaverse-app/releases/download/v1/app-release.apk";
 const CT={wa:"8801868219227",mail:"sheikhmuhammadbakir@gmail.com",fb:"https://www.facebook.com/sheikhmuhammadbakir.1",ig:"https://www.instagram.com/sheikhmuhammadbakir?cnvx=MXdlaWJhc2o4ZG9reQ=="};
@@ -179,30 +228,25 @@ if(r.ok){show(`<div class="card" style="text-align:center;padding:28px 14px"><di
 else if(r.err==="session"){store.del("mv_tok");store.del("mv_exp");loginScreen(L("অ্যাক্সেসের মেয়াদ শেষ। আবার প্রবেশ করতে নতুন OTP নিন।","Access expired. Request a new OTP to sign in again."))}
 else reportPage(r.err||L("পাঠানো যায়নি","Could not send"))}
 catch(e){reportPage(NET())}}
-function study(){CUR=study;POS=["study"];show(`<div class="hero"><h2 style="margin:0">📖 ${L("পড়াশোনা","Study")}</h2><small>${L("একটি অধ্যায়ে চাপ দিন, উত্তর ও ব্যাখ্যাসহ পড়ুন","Tap a chapter to read with answers and explanations")}</small></div>
-${CH.map((c,i)=>{const n=Q.filter(q=>q[0]==i).length;return `<button class="mn ch" ${n?`onclick="readCh(${i})"`:"disabled"}><span class="mi">${bn(i+1)}</span><span><b>${c}</b><small>${n?bn(n)+L("টি প্রশ্ন"," questions"):L("শীঘ্রই আসছে","Coming soon")}</small></span></button>`}).join("")}`,menu)}
+function studyBody(g){const ix=chIdx(g),nt=g==="eng"&&uIdx(g).length?`<div class="grp">📘 ${g==="eng"?L("ব্যাকরণ নোট","Grammar notes"):L("নোট","Notes")}</div>`+unitsBody(g).replace(/^<p class="viva-note"[^>]*>.*?<\/p>/,"")+`<div class="grp">📝 ${L("MCQ অনুশীলন","MCQ practice")}</div>`:"";if(!ix.length&&nt)return nt;if(!ix.length)return `<div class="card"><p class="viva-note">${L("শীঘ্রই আসছে","Coming soon")}</p></div>`;
+return `<p class="viva-note" style="margin:0 2px 10px">${L("একটি অধ্যায়ে চাপ দিন, উত্তর ও ব্যাখ্যাসহ পড়ুন","Tap a chapter to read with answers and explanations")}</p>${nt}${ix.map((i,k)=>{const c=CH[i],n=Q.filter(q=>q[0]==i).length;return `<button class="mn ch" ${n?`onclick="readCh(${i})"`:"disabled"}><span class="mi">${bn(k+1)}</span><span><b>${c}</b><small>${n?bn(n)+L("টি প্রশ্ন"," questions"):L("শীঘ্রই আসছে","Coming soon")}</small></span></button>`}).join("")}`}
 let SS={c:-1,mode:"p",ans:{}};
 function stCard(i,n){const x=Q[i],a=SS.ans[i],sh=SS.mode=="a"||a!==undefined;
 return`<div class="card bq" id="sc${i}" data-n="${n}"><b>${bn(n)}. ${mx(x[1],1)}</b>${x[2].map((o,k)=>`<button class="opt ${sh?(k==x[3]?"ok":k==a?"no":""):""}" onclick="stAns(${i},${k})">${OL()[k]}. ${mx(o,1)}${sh&&k==x[3]?" ✓":sh&&k==a?" ✗":""}</button>`).join("")}${sh&&x[4]?`<div class="exp">💡 ${mx(x[4],1)}</div>`:""}</div>`}
 function stAns(i,k){if(SS.ans[i]!==undefined||SS.mode=="a")return;SS.ans[i]=k;const e=$("sc"+i);if(e)e.outerHTML=stCard(i,+e.dataset.n)}
 function stRender(){const ids=[];Q.forEach((x,i)=>{if(x[0]==SS.c)ids.push(i)});$("stList").innerHTML=ids.map((i,k)=>stCard(i,k+1)).join("")}
 function readCh(c){CUR=()=>readCh(c);POS=["readCh",c];if(SS.c!=c)SS={c:c,mode:"p",ans:{}};
-show(`<h3 style="margin:6px 0 10px">${CH[c]}</h3><div class="card"><div class="viva-note" style="margin-bottom:4px">${L("কোনো অপশনে চাপ দিলে সঠিক উত্তর ও ব্যাখ্যা দেখা যাবে। চেকবক্সে টিক দিলে সবগুলো একসাথে দেখা যাবে","Tap an option to see its answer and explanation, or tick the box to reveal all")}</div><label class="row" style="border:0"><input type="checkbox" id="stM" ${SS.mode=="a"?"checked":""} onchange="SS.mode=this.checked?'a':'p';stRender()"><span>${L("সব উত্তর ও ব্যাখ্যা একসাথে দেখান","Show all answers and explanations")}</span></label></div><div id="stList"></div>`,study);stRender()}
+show(`<h3 style="margin:6px 0 10px">${CH[c]}</h3><div class="card"><div class="viva-note" style="margin-bottom:4px">${L("কোনো অপশনে চাপ দিলে সঠিক উত্তর ও ব্যাখ্যা দেখা যাবে। চেকবক্সে টিক দিলে সবগুলো একসাথে দেখা যাবে","Tap an option to see its answer and explanation, or tick the box to reveal all")}</div><label class="row" style="border:0"><input type="checkbox" id="stM" ${SS.mode=="a"?"checked":""} onchange="SS.mode=this.checked?'a':'p';stRender()"><span>${L("সব উত্তর ও ব্যাখ্যা একসাথে দেখান","Show all answers and explanations")}</span></label></div><div id="stList"></div>`,()=>study(chGroup(c)));stRender()}
 const kx=s=>{const rd=(t,d)=>{try{if(window.katex)return katex.renderToString(t,{throwOnError:false,strict:false,displayMode:d})}catch(e){}return esc(t)};return s.replace(/\$\$([\s\S]+?)\$\$/g,(_,t)=>rd(t,true)).replace(/\$([^$\n]+?)\$/g,(_,t)=>rd(t,false))};
-function units(){CUR=units;POS=["units"];show(`<div class="hero"><h2 style="margin:0">📐 ${L("এককের ধারণা","Concept of Units")}</h2><small>${L("একটি অধ্যায়ে চাপ দিয়ে পড়ুন","Tap a chapter to read")}</small></div>
-${UNITS.map((u,i)=>`<button class="mn ch" onclick="readUnit(${i})"><span class="mi">${bn(u.n)}</span><span><b>${u.title}</b></span></button>`).join("")}`,menu)}
+function unitsBody(g){g=g||"dept";return `<p class="viva-note" style="margin:0 2px 10px">${L("একটি অধ্যায়ে চাপ দিয়ে পড়ুন","Tap a chapter to read")}</p>${uIdx(g).map(i=>{const u=UNITS[i];return `<button class="mn ch" onclick="readUnit(${i})"><span class="mi">${bn(u.n)}</span><span><b>${u.title}</b></span></button>`}).join("")}`}
 function readUnit(i){CUR=()=>readUnit(i);POS=["readUnit",i];const u=UNITS[i];if(!u)return units();
+const g=uG(u),ix=uIdx(g),k=ix.indexOf(i),pv=k>0?ix[k-1]:-1,nx=k<ix.length-1?ix[k+1]:-1;
 show(`<h3 style="margin:6px 0 4px">${u.tag}: ${u.title}</h3><div class="card u">${kx(u.h)}</div>
-<div class="nav">${i>0?`<button class="btn g" onclick="readUnit(${i-1})">${L("← আগের অধ্যায়","← Previous")}</button>`:""}${i<UNITS.length-1?`<button class="btn" onclick="readUnit(${i+1})">${L("পরের অধ্যায় →","Next →")}</button>`:""}</div>`,units)}
-function vivaHome(){CUR=vivaHome;POS=["vivaHome"];
-clearInterval(S.t);
-show(`<div class="hero"><h2 style="margin:0 0 4px">${L("ভাইভা প্রস্তুতি","Viva Preparation")}</h2><small>${L("প্রশ্নে চাপ দিয়ে উত্তর ও পরের সম্ভাব্য প্রশ্ন দেখুন","Tap a question to see the answer and possible next questions")}</small></div>
-<div class="card"><p class="viva-note">${L("এগুলো নমুনা উত্তর। ভাইভায় মুখস্থ না বলে নিজের কথায় বলবেন। কোম্পানির কাজের ধরন অনুযায়ী উত্তর সাজাবেন। যা জানেন না, তা সৎভাবে বলবেন।","These are sample answers. Say them in your own words instead of memorising. Adapt them to the company's work, and be honest about what you don't know.")}</p>
+<div class="nav">${pv>=0?`<button class="btn g" onclick="readUnit(${pv})">${L("← আগের অধ্যায়","← Previous")}</button>`:""}${nx>=0?`<button class="btn" onclick="readUnit(${nx})">${L("পরের অধ্যায় →","Next →")}</button>`:""}</div>`,g==="eng"?(()=>study("eng")):units)}
+function vivaBody(){return `<p class="viva-note" style="margin:0 2px 10px">${L("প্রশ্নে চাপ দিয়ে উত্তর ও পরের সম্ভাব্য প্রশ্ন দেখুন","Tap a question to see the answer and possible next questions")}</p><div class="card"><p class="viva-note">${L("এগুলো নমুনা উত্তর। ভাইভায় মুখস্থ না বলে নিজের কথায় বলবেন। কোম্পানির কাজের ধরন অনুযায়ী উত্তর সাজাবেন। যা জানেন না, তা সৎভাবে বলবেন।","These are sample answers. Say them in your own words instead of memorising. Adapt them to the company's work, and be honest about what you don't know.")}</p>
 <input id="vivaSearch" class="viva-search" type="search" placeholder="${L("প্রশ্ন বা উত্তর খুঁজুন...","Search questions or answers...")}" oninput="renderViva()">
 <select id="vivaCat" class="viva-cat" onchange="renderViva()"><option value="">${L("সব বিভাগ","All categories")}</option>${VIVA_CATS.map((c,i)=>`<option value="${i}">${c}</option>`).join("")}</select>
-<div id="vivaCount" class="viva-note"></div><div id="vivaList"></div></div>`,menu);
-renderViva();
-}
+<div id="vivaCount" class="viva-note"></div><div id="vivaList"></div></div>`}
 function renderViva(){
 const q=$("vivaSearch")?.value.trim().toLowerCase()||"";
 const c=$("vivaCat")?.value??"";
@@ -214,12 +258,10 @@ $("vivaList").innerHTML=filtered.map(x=>`<div class="viva-item"><details><summar
 let BS={sec:-1,q:"",mode:"p",page:0,ans:{},tot:0,pages:1};const BQP=20;
 const BCS_EN=["Bangla Language & Literature","English Language & Literature","Bangladesh Affairs","International Affairs","General Science & Technology","Mathematical Reasoning & Mental Ability"];
 const bsec=i=>LANG==="en"?(BCS_EN[i]||BCS_SECS[i]):BCS_SECS[i];
-function bcsHome(){CUR=bcsHome;POS=["bcsHome"];clearInterval(S.t);S.running=false;
-show(`<div class="hero"><h2 style="margin:0 0 4px">🏛️ BCS Question Bank</h2><small>${L("১০ম–৫০তম বিসিএস প্রিলিমিনারি প্রশ্ন। কোনো অপশনে চাপ দিলে সঠিক উত্তর ও ব্যাখ্যা দেখা যাবে","10th–50th BCS preliminary questions. Tap an option to see the correct answer and explanation")}</small></div>
-<div class="card"><input id="bqS" class="viva-search" type="search" value="${esc(BS.q)}" placeholder="${L("প্রশ্ন খুঁজুন...","Search questions...")}" oninput="BS.q=this.value;BS.page=0;bcsRender()">
+function bcsBody(){return `<p class="viva-note" style="margin:0 2px 10px">${L("১০ম–৫০তম বিসিএস প্রিলিমিনারি প্রশ্ন। কোনো অপশনে চাপ দিলে সঠিক উত্তর ও ব্যাখ্যা দেখা যাবে","10th–50th BCS preliminary questions. Tap an option to see the correct answer and explanation")}</p><div class="card"><input id="bqS" class="viva-search" type="search" value="${esc(BS.q)}" placeholder="${L("প্রশ্ন খুঁজুন...","Search questions...")}" oninput="BS.q=this.value;BS.page=0;bcsRender()">
 <select id="bqC" class="viva-cat" onchange="BS.sec=+this.value;BS.page=0;bcsRender()"><option value="-1">${L("সব বিভাগ","All sections")}</option>${BCS_SECS.map((c,i)=>`<option value="${i}" ${BS.sec==i?"selected":""}>${bsec(i)}</option>`).join("")}</select>
 <label class="row" style="border:0"><input type="checkbox" id="bqM" ${BS.mode=="a"?"checked":""} onchange="BS.mode=this.checked?'a':'p';bcsRender(1)"><span>${L("সব উত্তর ও ব্যাখ্যা একসাথে দেখান","Show all answers and explanations")}</span></label>
-<div id="bqCount" class="viva-note"></div></div><div id="bqList"></div><div id="bqNav" style="margin-bottom:70px"></div>`,menu);bcsRender()}
+<div id="bqCount" class="viva-note"></div></div><div id="bqList"></div><div id="bqNav" style="margin-bottom:70px"></div>`}
 function bcsCard(i,n){const x=BCS[i],a=BS.ans[i],all=BS.mode=="a",sh=all||a!==undefined;
 return`<div class="card bq" id="bq${i}" data-n="${n}"><div class="bqh"><span class="bqn">${bn(n)}</span><span>${L(bn(x[5])+"তম বিসিএস","BCS "+x[5])} · ${bsec(x[0])}</span></div><b>${mx(x[1],1)}</b>${x[2].map((o,k)=>`<button class="opt ${sh?(k==x[3]?"ok":k==a?"no":""):""}" onclick="bcsAns(${i},${k})">${OL()[k]}. ${mx(o,1)}${sh&&k==x[3]?" ✓":sh&&k==a?" ✗":""}</button>`).join("")}${sh&&x[4]?`<div class="exp">💡 ${mx(x[4],1)}</div>`:""}</div>`}
 function bcsStat(){const k=Object.keys(BS.ans),ok=k.filter(i=>BS.ans[i]==BCS[i][3]).length;
@@ -233,8 +275,7 @@ $("bqNav").innerHTML=BS.pages>1?`<div class="nav">${BS.page>0?`<button class="bt
 bcsStat();if(!keep)window.scrollTo(0,0)}
 function bcsPg(d){BS.page+=d;bcsRender()}
 function bcsAns(i,k){if(BS.ans[i]!==undefined||BS.mode=="a")return;BS.ans[i]=k;const e=$("bq"+i);if(e)e.outerHTML=bcsCard(i,+e.dataset.n);bcsStat()}
-function examSetup(){CUR=examSetup;POS=["examSetup"];clearInterval(S.t);S.running=false;show(`<div class="hero"><h2 style="margin:0 0 4px">📝 ${L("পরীক্ষা","Exam")}</h2><small>${L("আপনার পছন্দ মতো অধ্যায়, সময় ও নম্বর ঠিক করুন","Choose chapters, time and marks as you like")}</small></div>
-<div class="grid"><div class="card"><label class="f">⏰ ${L("সময়","Time")}<select id="tm">${Array.from({length:12},(_,i)=>(i+1)*10).map(m=>`<option value="${m}" ${m==30?"selected":""}>${bn(m)} ${L("মিনিট","min")}</option>`).join("")}</select></label></div>
+function preBody(){return `<p class="viva-note" style="margin:0 2px 10px">${L("আপনার পছন্দ মতো অধ্যায়, সময় ও নম্বর ঠিক করুন","Choose chapters, time and marks as you like")}</p><div class="grid"><div class="card"><label class="f">⏰ ${L("সময়","Time")}<select id="tm">${Array.from({length:12},(_,i)=>(i+1)*10).map(m=>`<option value="${m}" ${m==30?"selected":""}>${bn(m)} ${L("মিনিট","min")}</option>`).join("")}</select></label></div>
 <div class="card"><label class="f">📚 ${L("MCQ-র সংখ্যা","Number of MCQs")}<select id="qn" onchange="autoTime()">${Array.from({length:20},(_,i)=>(i+1)*10).map(m=>`<option value="${m}">${bn(m)}${L("টি","")}</option>`).join("")}</select></label></div>
 <div class="card"><label class="f">✅ ${L("প্রতি প্রশ্নে মার্ক","Marks per question")}<select id="mk"><option value="1">${bn(1)}</option><option value="2">${bn(2)}</option></select></label></div>
 <div class="card"><label class="f">❌ ${L("নেগেটিভ মার্কিং","Negative marking")}<select id="ng"><option value="0">${bn(0)}</option><option value="0.25" selected>${bn("-0.25")}</option><option value="0.5">${bn("-0.5")}</option></select></label></div></div>
@@ -243,7 +284,7 @@ function examSetup(){CUR=examSetup;POS=["examSetup"];clearInterval(S.t);S.runnin
 <label class="f">${L("ভাইভা প্রশ্নের সংখ্যা","Number of viva questions")}<select id="vzn">${[5,10,20,50,100].map(m=>`<option value="${m}" ${m==10?"selected":""}>${bn(m)}${L("টি","")}</option>`).join("")}<option value="all">${L("সবগুলো","All")}</option></select></label></div>
 ${BCS.length?`<div class="card"><label class="row" style="border:0"><input type="checkbox" id="bz" onchange="document.getElementById('bzs').style.display=this.checked?'block':'none'"><span><b>🏛️ ${L("বিসিএস প্রশ্ন যোগ করুন","Include BCS questions")}</b><br><small class="viva-note">${L("ঐচ্ছিক। নির্বাচিত বিভাগের বিসিএস প্রিলিমিনারি প্রশ্ন MCQ-র সাথে মিশে আসবে।","Optional. BCS preliminary questions from the chosen sections are mixed with the MCQs.")}</small></span></label>
 <div id="bzs" style="display:none">${BCS_SECS.map((c,i)=>{const n=BCS.filter(q=>q[0]==i).length;return `<label class="row"><input type="checkbox" class="bk" value="${i}" checked ${n?"":"disabled"}><span>${bsec(i)}</span><b>${bn(n)}${L("টি","")}</b></label>`}).join("")}</div></div>`:""}
-<button class="btn" onclick="start()">${L("পরীক্ষা শুরু করুন","Start exam")}</button>`,menu)}
+<button class="btn" onclick="start()">${L("পরীক্ষা শুরু করুন","Start exam")}</button>`}
 function autoTime(){const q=+$("qn").value,t=Math.min(120,Math.max(10,Math.ceil(q*0.6/10)*10));$("tm").value=String(t)}
 function start(){const p=picked(),useV=$("vz").checked,bk=($("bz")&&$("bz").checked)?[...document.querySelectorAll(".bk:checked")].map(e=>+e.value):[],useB=bk.length>0;if(!p.length&&!useV&&!useB)return alert(L("অন্তত একটি অধ্যায় বা বিসিএস বিভাগ নির্বাচন করুন, অথবা ভাইভা প্রশ্ন যোগ করুন","Select at least one chapter or BCS section, or add viva questions"));
 let q=shuf(Q.filter(x=>p.includes(x[0])).concat(BCS.filter(x=>bk.includes(x[0])))).slice(0,+$("qn").value);
@@ -330,11 +371,11 @@ catch(e){otpScreen(id,NET())}}
 async function loadData(tok){
 busy(L("প্রশ্ন লোড হচ্ছে...","Loading questions..."));
 try{const r=await call({action:"data",token:tok});
-if(r.ok){CH=r.d.CH;Q=r.d.Q;VIVA=r.d.VIVA;VIVA_CATS=r.d.VIVA_CATS;UNITS=r.d.UNITS||[];BCS=r.d.BCS||[];BCS_SECS=r.d.BCS_SECS||[];if(r.expiresAt)store.set("mv_exp",String(r.expiresAt));$("lo").style.display="";$("mb").style.display="";if(enforceExpiry()&&!restorePos())splash()}
+if(r.ok){CH=r.d.CH;CHG=r.d.CHG||[];Q=r.d.Q;VIVA=r.d.VIVA;VIVA_CATS=r.d.VIVA_CATS;UNITS=r.d.UNITS||[];BCS=r.d.BCS||[];BCS_SECS=r.d.BCS_SECS||[];if(r.expiresAt)store.set("mv_exp",String(r.expiresAt));$("lo").style.display="";$("mb").style.display="";if(enforceExpiry()&&!restorePos())splash()}
 else if(r.err==="session"){store.del("mv_tok");store.del("mv_exp");loginScreen(L("অ্যাক্সেসের মেয়াদ শেষ। আবার প্রবেশ করতে নতুন OTP নিন।","Access expired. Request a new OTP to sign in again."))}
 else{A.innerHTML=`<div class="card"><p>${esc(r.err||L("ডেটা আনা যায়নি","Could not load data"))}</p><button class="btn" onclick="loadData('${tok}')">${L("আবার চেষ্টা করুন","Try again")}</button></div>`}}
 catch(e){A.innerHTML=`<div class="card"><p>${NET()}.</p><button class="btn" onclick="loadData('${tok}')">${L("আবার চেষ্টা করুন","Try again")}</button></div>`}}
-function logout(){if(!confirm(L("বের হতে চান?","Log out?")))return;store.del("mv_pos");clearExpiryTimer();store.del("mv_tok");store.del("mv_exp");CH=[];Q=[];VIVA=[];VIVA_CATS=[];UNITS=[];loginScreen()}
+function logout(){if(!confirm(L("বের হতে চান?","Log out?")))return;store.del("mv_pos");clearExpiryTimer();store.del("mv_tok");store.del("mv_exp");CH=[];CHG=[];Q=[];VIVA=[];VIVA_CATS=[];UNITS=[];BCS=[];BCS_SECS=[];loginScreen()}
 
 let SQ={t:"",tk:null,a:0,b:0,node:null};
 const SQB=/^[\s,;:()\[\]{}"'“”‘’।?!.\-–—]+|[\s,;:()\[\]{}"'“”‘’।?!.\-–—]+$/g;

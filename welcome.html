@@ -47,11 +47,11 @@ footer{margin-top:30px;padding:22px 0;border-top:1px solid var(--bd);color:var(-
 </div></div>
 <div class="w">
 <section><h2>অ্যাপে যা আছে</h2><div class="g2">
-<div class="c"><b>📖 পড়াশোনা</b><span>অধ্যায় ভিত্তিক ২০০০+ MCQ, উত্তর ও ব্যাখ্যাসহ।</span></div>
-<div class="c"><b>🎤 ভাইভা প্রস্তুতি</b><span>২০০টি ভাইভা প্রশ্ন, উত্তর ও পরের সম্ভাব্য প্রশ্নসহ।</span></div>
+<div class="c"><b>📖 পড়াশোনা</b><span>ডিপার্টমেন্ট ও ইংলিশ অধ্যায় ভিত্তিক <b style="display:inline" data-s="mcq">৩৫০০+</b> MCQ, উত্তর ও ব্যাখ্যাসহ।</span></div>
+<div class="c"><b>🎤 ভাইভা প্রস্তুতি</b><span><b style="display:inline" data-s="viva">২০০</b>টি ভাইভা প্রশ্ন, উত্তর ও পরের সম্ভাব্য প্রশ্নসহ। ভাইভা বোর্ডের মতো পরীক্ষাও দেওয়া যায়।</span></div>
 <div class="c"><b>📐 এককের ধারণা</b><span>মৌলিক থেকে যৌগিক রাশি, একক রূপান্তর ও মাত্রা বিশ্লেষণ।</span></div>
-<div class="c"><b>🏛️ BCS Question Bank</b><span>১০ম–৫০তম বিসিএস প্রিলিমিনারি প্রশ্ন, বিভাগ অনুযায়ী খোঁজার সুবিধা।</span></div>
-<div class="c"><b>📝 মডেল টেস্ট</b><span>সময়, নম্বর ও নেগেটিভ মার্কিং নিজের মতো ঠিক করে পরীক্ষা দিন।</span></div>
+<div class="c"><b>🏛️ BCS Question Bank</b><span>১০ম–৫০তম বিসিএস প্রিলিমিনারি, <b style="display:inline" data-s="bcs">৫২০০+</b> প্রশ্ন, বিভাগ অনুযায়ী খোঁজার সুবিধা।</span></div>
+<div class="c"><b>📝 প্রিলি মডেল টেস্ট</b><span>সময়, নম্বর ও নেগেটিভ মার্কিং নিজের মতো ঠিক করে পরীক্ষা দিন।</span></div>
 <div class="c"><b>🔍 সার্চ ও ভাষা বদল</b><span>প্রশ্ন খুঁজুন, শব্দ সিলেক্ট করে সার্চ করুন, বাংলা ও ইংরেজি বেছে নিন।</span></div>
 </div></section>
 <section><h2>কীভাবে শুরু করবেন</h2><div class="st">
@@ -72,6 +72,20 @@ footer{margin-top:30px;padding:22px 0;border-top:1px solid var(--bd);color:var(-
 // APK ডাউনলোডের লিংক পেলে এখানে বসান; ফাঁকা থাকলে বোতামটি লুকানো থাকবে।
 var APK_URL="https://github.com/2926104239-afk/mechaverse-app/releases/download/v1/app-release.apk";
 if(APK_URL){var a=document.getElementById("apk");a.href=APK_URL;a.style.display="inline-block"}
+
+// প্রশ্নের সংখ্যা সার্ভার থেকে স্বয়ংক্রিয়ভাবে আসে (শুধু সংখ্যা, কোনো প্রশ্ন নয়)। আনা না গেলে ওপরের লেখাই থাকে।
+var API="https://script.google.com/macros/s/AKfycbyccCrYpZvexzHcwLzHgNui7FyLHjMIFINXx3vaBm-IgpiJdyz95a1Qw1hrksdJif5R/exec";
+(function(){
+  function bn(n){return String(n).replace(/\d/g,function(d){return"০১২৩৪৫৬৭৮৯"[d]})}
+  function round(n){return n>=1000?bn(Math.floor(n/100)*100)+"+":(n>=100?bn(Math.floor(n/10)*10)+"+":bn(n))}
+  function put(k,t){var e=document.querySelectorAll('[data-s="'+k+'"]');for(var i=0;i<e.length;i++)e[i].textContent=t}
+  try{fetch(API+"?stats=1").then(function(r){return r.json()}).then(function(s){
+    if(!s||!s.ok)return;
+    if(s.mcq>0)put("mcq",round(s.mcq));
+    if(s.viva>0)put("viva",bn(s.viva));
+    if(s.bcs>0)put("bcs",round(s.bcs));
+  }).catch(function(){})}catch(e){}
+})();
 </script>
 </body>
 </html>
